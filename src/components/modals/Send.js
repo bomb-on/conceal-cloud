@@ -22,7 +22,7 @@ const SendModal = props => {
 
   const [availableWallets, setAvailableWallets] = useState({});
   const [selectedWallet, setSelectedWallet] = useState(wallet || { balance: 0 });
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState(null);
   const [qrReaderOpened, setQrReaderOpened] = useState(false);
 
   const { value: address, bind: bindAddress, paymentIDValue } = useTypeaheadInput(props.contact ? props.contact.address : '');
@@ -114,7 +114,7 @@ const SendModal = props => {
             sendTx(
               {
                 e,
-                wallet: props.address,
+                wallet: walletAddress || props.address,
                 address,
                 paymentID,
                 amount,
