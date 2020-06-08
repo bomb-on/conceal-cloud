@@ -29,7 +29,7 @@ const Donate = props => {
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState('');
 
-  const maxValue = wallet ? (wallet.balance - defaultFee).toFixed(coinDecimals) : 0;
+  const maxValue = wallet ? (wallet.balance - wallet.locked - defaultFee).toFixed(coinDecimals) : 0;
 
   const formValid = useSendFormValidation({
     amount,
