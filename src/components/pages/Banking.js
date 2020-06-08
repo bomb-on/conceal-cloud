@@ -19,10 +19,8 @@ const Banking = () => {
 
   const tierCoeff = { 1: 0.029, 2: 0.039, 3: 0.049 };
   const [currentTier, setCurrentTier] = useState(1);
-  const [ear, setEar] = useState(tierCoeff[currentTier]);
   const [eir, setEir] = useState(depositInterestRate);
   const [tea, setTea] = useState(amount);
-  const [address, setAddress] = useState(false);
   const [maxAmount, setMaxAmount] = useState(1);
 
   const handleTier = e => {
@@ -38,7 +36,6 @@ const Banking = () => {
   }
 
   const handleAddress = e => {
-    setAddress(e);
     if (wallets[e]) setMaxAmount(Math.floor(wallets[e].balance - depositFee));
   }
 
@@ -55,7 +52,6 @@ const Banking = () => {
     const ear = tierCoeff[currentTier] + (Number(time) - 1) * 0.001;
     const eir = ear/12 * Number(time);
     const tea = parseFloat(amount) * (1 + eir);
-    setEar(ear);
     setEir(eir);
     setTea(tea);
   }, [amount, time]);
@@ -74,10 +70,9 @@ const Banking = () => {
           </div>
 
           <div className="section-wrapper mg-t-20">
-            <label className="section-title">Banking</label>
             <div className="row">
               <div className="col-lg-7">
-                <h4>New deposit</h4>
+                <label className="section-title">New Deposit</label>
                 <div className="form-layout form-layout-7">
                   <div className="row no-gutters">
                     <div className="col-5 col-sm-4">
@@ -168,20 +163,25 @@ const Banking = () => {
                   </div>
                 </div>
 
-                <div>
-                  <h5>Deposit details</h5>
-                  {/*<div>TIER: {currentTier}</div>
-                  <div>EAR: {ear}</div>
-                  <div>EIR: {eir}</div>
-                  <div>TEA: {tea}</div>*/}
-                  <div>Interest rate: {parseFloat((eir).toFixed(6)) * 100}%</div>
-                  <div>Rewards: <FormattedAmount amount={(tea - amount)} /></div>
-                  <div>Fees: <FormattedAmount amount={depositFee}/></div>
-                  <div>Blockchain length: {time * depositBlocksPerMonth} blocks</div>
+                <div className="d-flex flex-row justify-content-between new-deposit-details">
+                  <div>
+                    <h5>Deposit details</h5>
+                    {/*<div>TIER: {currentTier}</div>
+                    <div>EAR: {ear}</div>
+                    <div>EIR: {eir}</div>
+                    <div>TEA: {tea}</div>*/}
+                    <div>Interest rate: <span className="text-white">{(parseFloat(eir) * 100).toFixed(6)}%</span></div>
+                    <div>Rewards: <span className="text-white"><FormattedAmount amount={(tea - amount)} /></span></div>
+                    <div>Fees: <span className="text-white"><FormattedAmount amount={depositFee}/></span></div>
+                    <div>Blockchain length: <span className="text-white">{time * depositBlocksPerMonth} blocks</span></div>
+                  </div>
+                  <div>
+                    <button className="btn btn-outline-success">MAKE DEPOSIT</button>
+                  </div>
                 </div>
               </div>
               <div className="col-lg-5">
-                <h4>Deposit history</h4>
+                <label className="section-title">Deposits History</label>
                 <div className="table-responsive">
                   <table className="table table-striped table-hover mg-b-0">
                     <thead>
@@ -219,6 +219,105 @@ const Banking = () => {
                       </tr>
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div className="row">
+              <div className="col-lg-12">
+                <label className="section-title">Current Deposits</label>
+                <div className="current-deposits">
+                  <ul className="list-group">
+                    <li className="list-group-item">
+                      <div className="d-flex flex-row justify-content-between current-deposit-details">
+                        <div className="current-deposit-start">
+                          Start Block: 23456
+                          <br />
+                          Start Date: 2020-02-01 00:00:01
+                          <br />
+                          Amount: 12345.00000 CCX
+                        </div>
+                        <div className="text-right current-deposit-end">
+                          End Block: 34567 <small>(23456 blocks left)</small>
+                          <br />
+                          Expected End Date: 2021-02-01 00:00:01
+                          <br />
+                          Interest: 12.34567 CCX <small>(0.21467%)</small>
+                        </div>
+                      </div>
+                      <div className="progress mg-b-10">
+                        <div
+                          className="progress-bar progress-bar-striped bg-warning wd-2p"
+                          role="progressbar"
+                          aria-valuenow="2"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          2%
+                        </div>
+                      </div>
+                    </li>
+                    <li className="list-group-item">
+                      <div className="d-flex flex-row justify-content-between current-deposit-details">
+                        <div className="current-deposit-start">
+                          Start Block: 12345
+                          <br />
+                          Start Date: 2020-01-01 00:00:01
+                          <br />
+                          Amount: 12345.00000 CCX
+                        </div>
+                        <div className="text-right current-deposit-end">
+                          End Block: 23456 <small>(12345 blocks left)</small>
+                          <br />
+                          Expected End Date: 2021-01-01 00:00:01
+                          <br />
+                          Interest: 12.34567 CCX <small>(0.21467%)</small>
+                        </div>
+                      </div>
+                      <div className="progress mg-b-10">
+                        <div
+                          className="progress-bar progress-bar-striped bg-warning wd-15p"
+                          role="progressbar"
+                          aria-valuenow="15"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          15%
+                        </div>
+                      </div>
+                    </li>
+                    <li className="list-group-item">
+                      <div className="d-flex flex-row justify-content-between current-deposit-details">
+                        <div className="current-deposit-start">
+                          Start Block: 54321
+                          <br />
+                          Start Date: 2019-07-01 00:00:01
+                          <br />
+                          Amount: 12345.00000 CCX
+                        </div>
+                        <div className="text-right current-deposit-end">
+                          End Block: 65432 <small>(123 blocks left)</small>
+                          <br />
+                          Expected End Date: 2020-07-01 00:00:01
+                          <br />
+                          Interest: 12.34567 CCX <small>(0.21467%)</small>
+                        </div>
+                      </div>
+                      <div className="progress mg-b-10">
+                        <div
+                          className="progress-bar progress-bar-striped bg-warning wd-85p"
+                          role="progressbar"
+                          aria-valuenow="85"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          85%
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
