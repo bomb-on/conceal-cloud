@@ -44,7 +44,7 @@ const MarketStats = () => {
         ticks: {
           maxTicksLimit: 5,
           fontSize: 10,
-          callback: amount => `$ ${formattedStringAmount({ amount, currency: 'USD', useSymbol: true })}`
+          callback: amount => `${formattedStringAmount({ amount, currency: 'USD', useSymbol: true })}`
         },
         gridLines: {
           color: 'rgba(255, 255, 255, .08)'
@@ -70,7 +70,7 @@ const MarketStats = () => {
       mode: 'index',
       intersect: false,
       callbacks: {
-        label: item => `$ ${formattedStringAmount({ amount: item.value, currency: 'USD', useSymbol: true })}`
+        label: item => `${formattedStringAmount({ amount: item.value, currency: 'USD', useSymbol: true })}`
       }
     },
   };
