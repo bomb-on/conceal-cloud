@@ -261,7 +261,7 @@ const AppContextProvider = props => {
                 showNotification({
                   message: <NewTxMessage tx={tx} />,
                   title: `NEW ${tx.type === 'received' ? 'INCOMING' : 'OUTGOING'} TRANSACTION`,
-                  type: tx.type === 'received' ? 'success' : 'danger',
+                  type: tx.type === 'received' ? 'success' : 'warning',
                   dismiss: { duration: 0, click: false, touch: false, showIcon: true },
                 });
               });
@@ -400,7 +400,7 @@ const AppContextProvider = props => {
         getWallets();
       })
       .catch(err => showNotification({
-        message: err,
+        message: `${err}`,
         title: 'ERROR SENDING CCX',
         type: 'danger',
         dismiss: { duration: 0, click: false, touch: false, showIcon: true },

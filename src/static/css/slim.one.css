@@ -1668,15 +1668,24 @@ label.codeExample {
 
 /******************** Notifications *********************/
 
-.btn-notification-copy {
+.tx-notification a,
+.tx-notification a:link,
+.tx-notification a:visited,
+.tx-notification .btn-notification-copy {
+  color: rgb(0, 0, 0);
+}
+
+.tx-notification a:hover {
+  color: rgb(61, 61, 61);
+}
+
+.tx-notification .btn-notification-copy {
   font-size: 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.8);
+  border: none;
   margin-left: 0.2rem;
   padding: 0.1rem 0.3rem;
 }
 
-.btn-notification-copy:hover {
-  border: 1px solid rgba(255, 255, 255, 1);
-  color: rgba(255, 255, 255, 1);
+.tx-notification .btn-notification-copy:hover {
+  color: rgb(61, 61, 61);
 }
