@@ -624,7 +624,7 @@ const AppContextProvider = props => {
   const onRouteChanged = props => {
     const { location } = props;
     const isRedirect = props.history.action === 'REPLACE';
-    if ((location.pathname !== '/signup' && !location.pathname.startsWith('/reset_password')) || !isRedirect) {
+    if (location.pathname !== '/signup' && !location.pathname.startsWith('/reset_password') && (location.pathname === '/login' && !isRedirect)) {
       dispatch({ type: 'DISPLAY_MESSAGE', message: null });
     }
     if (location.pathname === '/login' && location.search === '?activated') {
