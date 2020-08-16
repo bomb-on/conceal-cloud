@@ -22,10 +22,10 @@ const SendModal = props => {
 
   const [availableWallets, setAvailableWallets] = useState({});
   const [selectedWallet, setSelectedWallet] = useState(wallet || { balance: 0 });
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState(null);
   const [qrReaderOpened, setQrReaderOpened] = useState(false);
 
-  const { value: address, bind: bindAddress, paymentIDValue } = useTypeaheadInput(props.contact ? props.contact.address : '');
+  const { value: address, bind: bindAddress, reset: resetAddress, paymentIDValue } = useTypeaheadInput(props.contact ? props.contact.address : '');
   const { value: paymentID, bind: bindPaymentID, setValue: setPaymentIDValue, reset: resetPaymentID } = useFormInput(props.contact ? props.contact.paymentID : '');
   const { value: amount, bind: bindAmount, setValue: setAmountValue, reset: resetAmount } = useFormInput('');
   const { value: message, bind: bindMessage, setValue: setMessageValue, reset: resetMessage } = useFormInput('');
@@ -34,12 +34,19 @@ const SendModal = props => {
   const { value: label, bind: bindLabel, setValue: setLabelValue, reset: resetLabel } = useFormInput('');
 
   const parsedAmount = !Number.isNaN(parseFloat(amount)) ? parseFloat(amount) : 0;
-  const totalAmount = parsedAmount > 0 ? parsedAmount + defaultFee : 0;
-  const maxValue = (selectedWallet.balance - defaultFee).toFixed(coinDecimals);
+  const totalAmount = parsedAmount > 0 ? parseFloat((parsedAmount + defaultFee).toFixed(coinDecimals)) : 0;
+  const [maxValue, setMaxValue] = useState((selectedWallet.balance - defaultFee).toFixed(coinDecimals));
   const calculateMax = () => setAmountValue(maxValue);
 
   useEffect(() => {
-    if (paymentIDValue) setPaymentIDValue(paymentIDValue);
+    if (wallet) {
+      setSelectedWallet(wallet);
+      setMaxValue((wallet.balance - defaultFee).toFixed(coinDecimals));
+    }
+  }, [coinDecimals, defaultFee, wallet]);
+
+  useEffect(() => {
+    setPaymentIDValue(paymentIDValue);
   }, [paymentIDValue, setPaymentIDValue]);
 
   const formValid = useSendFormValidation({
@@ -114,7 +121,7 @@ const SendModal = props => {
             sendTx(
               {
                 e,
-                wallet: props.address,
+                wallet: walletAddress || props.address,
                 address,
                 paymentID,
                 amount,
@@ -126,6 +133,7 @@ const SendModal = props => {
               },
               [
                 resetAddressInput,
+                resetAddress,
                 resetPaymentID,
                 resetAmount,
                 resetMessage,

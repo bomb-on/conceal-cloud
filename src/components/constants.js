@@ -3,9 +3,9 @@ export const constants = {
   apiURL: process.env.REACT_APP_API_ENDPOINT,
   homePage: 'https://conceal.network',
   explorerURL: 'https://explorer.conceal.network',
-  poolURL: 'https://pool.conceal.network',
+  poolURL: 'https://pool.conceal.community',
   coingeckoAPI: 'https://api.coingecko.com/api/v3',
-  discord: 'https://discord.gg/QY4ksas',
+  discord: 'https://discord.conceal.network',
   twitter: 'https://twitter.com/ConcealNetwork',
   reddit: 'https://www.reddit.com/r/ConcealNetwork',
   telegram: 'https://t.me/concealnetworkusers',
@@ -15,7 +15,7 @@ export const constants = {
   updateBlockchainHeightInterval: 30,  // seconds
   updateMarketPricesInterval: 120,  // seconds
   maxWallets: 2,
-  coinDecimals: 5,
+  coinDecimals: 6,
   defaultFee: 0.001,
   messageFee: 0.001,
   selfDestructMessageFee: 0.001,

@@ -5,53 +5,48 @@
 ### Usage
 
 Requirements:
- - NodeJS (v10 or higher)
-
-Optional requirements:
- - Yarn (installed globally)
+ - NodeJS (v14 or higher)
 
 #### Development
 
 Clone repository:
 ```bash
-git clone https://github.com/bomb-on/conceal.cloud
-cd conceal.cloud
+git clone https://github.com/ConcealNetwork/conceal-cloud
+cd conceal-cloud
 
-# optional, checkout specific branch
-# git checkout release/0.1.0
+# optional, checkout specific tag
+# git checkout tags/<tag> -b <branch>
 ```
 
 Install project dependencies:
 ```bash
-yarn install
-# or
-# npm install
+npm install
 ```
 
 Run local development server:
 ```bash
-yarn start
-# or
-# npm start
+npm start
 ```
 
-Build for deployment:
+Build production-ready version:
 ```bash
-yarn build
-# or
-# npm run-script build
+npm run build
 ```
 
-API endpoint can be overwritten with `REACT_APP_API_ENDPOINT` environmental variable:
+Deploy on development (proper AWS credentials needed):
 ```bash
-export REACT_APP_API_ENDPOINT=http://blah/ && yarn build
-# or
-# export REACT_APP_API_ENDPOINT=http://blah/ && npm run-script build
+npm run aws:dev
+```
+
+Default API endpoint can be overwritten by setting `REACT_APP_API_ENDPOINT`
+environmental variable:
+```bash
+export REACT_APP_API_ENDPOINT=http://blah/ && npm run build
 ```
 
 #### Production
 
-Run production npm script (not available yet):
+Build and deploy to production (proper AWS credentials needed):
 ```bash
-npm run deploy
+npm run aws:prod
 ```
