@@ -15,7 +15,7 @@ export const constants = {
   updateBlockchainHeightInterval: 30,  // seconds
   updateMarketPricesInterval: 120,  // seconds
   maxWallets: 2,
-  coinDecimals: 5,
+  coinDecimals: 6,
   defaultFee: 0.001,
   messageFee: 0.001,
   selfDestructMessageFee: 0.001,
