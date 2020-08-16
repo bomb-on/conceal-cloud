@@ -1,4 +1,13 @@
-#### 1.3.4 (2019-03-02)
+#### 1.3.5 (2020-03-02)
+
+**Bug Fixes**
+
+ - Fixed displaying "$" symbol twice in Market Stats
+ - Fixed "max value" calculation during sending
+ - Fixed displaying the message after signing up
+ - Using 6 decimals for CCX values by default
+
+#### 1.3.4 (2020-03-02)
 
 **Bug Fixes**
 
@@ -6,7 +15,7 @@
  - Sending funds to contact from Address Book now properly pre-fills input fields with address and payment ID
  - Removed pre-filling of password field in forms related to sending funds
 
-#### 1.3.3 (2019-02-29)
+#### 1.3.3 (2020-02-29)
 
 **Features**
 
@@ -17,7 +26,7 @@
  - Fixed an issue with sending funds
  - BTC balance in Dashboard now includes locked balance in calculation
 
-#### 1.3.2 (2019-02-27)
+#### 1.3.2 (2020-02-27)
 
 **Features**
 
