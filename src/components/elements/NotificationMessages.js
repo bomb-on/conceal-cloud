@@ -7,7 +7,7 @@ import { CCXExplorerLink, FormattedAmount, maskAddress } from '../../helpers/uti
 export const NewTxMessage = props => {
   const { tx } = props;
   return (
-    <div>
+    <div className="tx-notification">
       <div><small>{new Date(tx.timestamp).toLocaleString()}</small></div>
       <div>Amount: <FormattedAmount amount={tx.amount}/></div>
       <div><span title={tx.address}>Wallet: {maskAddress(tx.address)}</span></div>
@@ -20,7 +20,7 @@ export const NewTxMessage = props => {
 export const TxSentMessage = props => {
   const { tx } = props;
   return (
-    <div>
+    <div className="tx-notification">
       <div><small>{new Date().toLocaleString()}</small></div>
       <div><span title={tx.transactionHash}>Hash: <CCXExplorerLink hash={maskAddress(tx.transactionHash)}/></span></div>
       <div>

@@ -22,7 +22,7 @@ export const useTypeaheadInput = init => {
   const onChange = value => {
     if (value.length > 0) {
       value[0].address ? setDefaultInputValue(value[0].address) : setDefaultInputValue(value[0]);
-      if (value[0].paymentID !== '') setPaymentIDValue(value[0].paymentID)
+      setPaymentIDValue(value[0].paymentID || '');
     }
   };
   const reset = () => setDefaultInputValue('');
@@ -79,7 +79,7 @@ export const useSendFormValidation = ({
 
   if (wallet) {
     const parsedAmount = !Number.isNaN(parseFloat(amount)) ? parseFloat(amount) : 0;
-    const totalAmount = parsedAmount > 0 ? parsedAmount + defaultFee : 0;
+    const totalAmount = parsedAmount > 0 ? parseFloat((parsedAmount + defaultFee).toFixed(coinDecimals)) : 0;
     const walletBalanceValid = totalAmount <= parseFloat(wallet.balance.toFixed(coinDecimals));
 
     isValid = (
@@ -87,7 +87,7 @@ export const useSendFormValidation = ({
       (WAValidator.validate(toAddress, 'CCX') || new RegExp(/^[a-z0-9]*\.conceal\.id/).test(toAddress)) &&
       totalAmount > 0 &&
       walletBalanceValid &&
-      (message !== '' || message.length <= messageLimit) &&
+      (message === '' || message.length <= messageLimit) &&
       (paymentID === '' || paymentID.length === 64) &&
       (twoFAEnabled
           ? (parseInt(twoFACode) && twoFACode.toString().length === 6)
