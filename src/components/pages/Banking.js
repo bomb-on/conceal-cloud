@@ -1,27 +1,34 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 import ReactSlider from 'react-slider';
+import { BiLockAlt, BiLockOpenAlt } from 'react-icons/bi';
 
 import { AppContext } from '../ContextProvider';
-import { useFormInput } from '../../helpers/hooks';
+import { useFormInput, useFormValidation } from '../../helpers/hooks';
 import FormLabelDescription from '../elements/FormLabelDescription';
 import { FormattedAmount } from '../../helpers/utils';
 import WalletInput from '../elements/WalletInput';
 
 
 const Banking = () => {
-  const { state } = useContext(AppContext);
-  const { appSettings, wallets } = state;
-  const { coinDecimals, depositFee, depositBlocksPerMonth, depositInterestRate } = appSettings;
+  const { actions, state } = useContext(AppContext);
+  const { createDeposit, getDeposits, unlockDeposit } = actions;
+  const { appSettings, deposits, layout, network, userSettings, wallets } = state;
+  const { coinDecimals, coinDifficultyTarget, depositFee, depositBlocksPerMonth, depositInterestRate } = appSettings;
+  const { formSubmitted, message } = layout;
 
-  const { value: amount, bind: bindAmount, setValue: setAmount } = useFormInput(1);
-  const { value: time, bind: bindTime } = useFormInput(1);
+  const { value: amount, bind: bindAmount, setValue: setAmount, reset: resetAmount } = useFormInput(1);
+  const { value: term, bind: bindTerm, reset: resetTerm } = useFormInput(1);
+  const { value: twoFACode, bind: bindTwoFACode, reset: resetTwoFACode } = useFormInput('');
+  const { value: password, bind: bindPassword, reset: resetPassword } = useFormInput('');
 
   const tierCoeff = { 1: 0.029, 2: 0.039, 3: 0.049 };
   const [currentTier, setCurrentTier] = useState(1);
   const [eir, setEir] = useState(depositInterestRate);
   const [tea, setTea] = useState(amount);
   const [maxAmount, setMaxAmount] = useState(1);
+  const [wallet, setWallet] = useState(1);
 
   const handleTier = e => {
     let tier = 1;
@@ -31,30 +38,46 @@ const Banking = () => {
   };
 
   const onSliderChange = e => {
-    console.log(e);
+    // console.log(e);
     setAmount(e);
   }
 
-  const handleAddress = e => {
-    if (wallets[e]) setMaxAmount(Math.floor(wallets[e].balance - depositFee));
+  const handleAddress = address => {
+    if (wallets[address]) {
+      setMaxAmount(Math.floor(wallets[address].balance - depositFee));
+      setWallet(address);
+    }
   }
 
   const handlePercentage = p => {
     if (maxAmount > 1) {
-      console.log(p);
+      // console.log(p);
       const c = maxAmount * p / 100;
-      console.log(c)
+      // console.log(c)
       setAmount(maxAmount * p / 100);
     }
   }
 
+  const formValidation = (
+    wallet &&
+    maxAmount >= amount >= 1 &&
+    12 >= term >= 1 &&
+    twoFACode.length === 6
+  );
+
+  const formValid = useFormValidation(formValidation);
+
   useEffect(() => {
-    const ear = tierCoeff[currentTier] + (Number(time) - 1) * 0.001;
-    const eir = ear/12 * Number(time);
-    const tea = parseFloat(amount) * (1 + eir);
+    const ear = tierCoeff[currentTier] + (Number(term) - 1) * 0.001;
+    const eir = ear/12 * Number(term);
+    const tea = eir > 0 ? amount * (1 + eir) : 0;
     setEir(eir);
     setTea(tea);
-  }, [amount, time]);
+  }, [amount, term]);
+
+  useEffect(() => {
+    getDeposits();
+  }, []);
 
   return (
     <div>
@@ -73,153 +96,213 @@ const Banking = () => {
             <div className="row">
               <div className="col-lg-7">
                 <label className="section-title">New Deposit</label>
-                <div className="form-layout form-layout-7">
-                  <div className="row no-gutters">
-                    <div className="col-5 col-sm-4">
-                      <div>
-                        Wallet <FormLabelDescription>Wallet to use for deposit</FormLabelDescription>
+                <form
+                  onSubmit={e => createDeposit(
+                    { e, amount, password, term: term * depositBlocksPerMonth, twoFACode, wallet, id: 'depositForm' },
+                    [resetAmount, resetPassword, resetTerm, resetTwoFACode],
+                  )}
+                >
+                  <div className="form-layout form-layout-7">
+                    <div className="row no-gutters">
+                      <div className="col-5 col-sm-4">
+                        <div>
+                          Wallet <FormLabelDescription>Wallet to use for deposit</FormLabelDescription>
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-7 col-sm-8 wallet-address">
-                      <WalletInput
-                        emptyLabel="No wallets found."
-                        filterBy={['address']}
-                        hideAddon={true}
-                        placeholder="Select wallet with enough funds"
-                        setAddress={handleAddress}
-                        wallets={
-                          Object.keys(wallets).reduce((a, address) => {
-                            if (wallets[address].balance > 1 + depositFee) a.push({ address });
-                            return a;
-                          }, [])
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="row no-gutters">
-                    <div className="col-5 col-sm-4">
-                      Amount
-                      <FormLabelDescription>Amount of CCX to deposit (lock)</FormLabelDescription>
-                    </div>
-                    <div className="col-7 col-sm-8">
-                      <div className="input-group">
-                        <input
-                          {...bindAmount}
-                          onKeyUp={handleTier}
-                          size={2}
-                          placeholder="Amount"
-                          className="form-control"
-                          name="amount"
-                          type="number"
-                          min={0}
-                          max={maxAmount}
-                          step={Math.pow(10, -coinDecimals).toFixed(coinDecimals)}
+                      <div className="col-7 col-sm-8 wallet-address">
+                        <WalletInput
+                          emptyLabel="No wallets found."
+                          filterBy={['address']}
+                          hideAddon={true}
+                          placeholder="Select wallet with enough funds"
+                          setAddress={handleAddress}
+                          wallets={
+                            Object.keys(wallets).reduce((a, address) => {
+                              if (wallets[address].balance > 1 + depositFee) a.push({ address });
+                              return a;
+                            }, [])
+                          }
                         />
-                        <span className="input-group-btn">CCX</span>
                       </div>
                     </div>
-                  </div>
-                  <div className="row no-gutters">
-                    <div className="col-5 col-sm-4">
-                      Time
-                      <FormLabelDescription>Months</FormLabelDescription>
-                    </div>
-                    <div className="col-7 col-sm-8">
-                      <div className="input-group">
-                        <input
-                          {...bindTime}
-                          size={2}
-                          placeholder="Time"
-                          className="form-control"
-                          name="time"
-                          type="number"
-                          min={1}
-                          max={12}
-                          step={1}
-                        />
-                        <span className="input-group-btn">Month{time > 1 ? 's' : ''}</span>
+                    <div className="row no-gutters">
+                      <div className="col-5 col-sm-4">
+                        Amount
+                        <FormLabelDescription>Amount of CCX to deposit (lock)</FormLabelDescription>
+                      </div>
+                      <div className="col-7 col-sm-8">
+                        <div className="input-group">
+                          <input
+                            {...bindAmount}
+                            onKeyUp={handleTier}
+                            size={2}
+                            placeholder="Amount"
+                            className="form-control"
+                            name="amount"
+                            type="number"
+                            min={0}
+                            max={maxAmount}
+                            step={Math.pow(10, -coinDecimals).toFixed(coinDecimals)}
+                          />
+                          <span className="input-group-btn">CCX</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                    <div className="row no-gutters">
+                      <div className="col-5 col-sm-4">
+                        Time
+                        <FormLabelDescription>Months</FormLabelDescription>
+                      </div>
+                      <div className="col-7 col-sm-8">
+                        <div className="input-group">
+                          <input
+                            {...bindTerm}
+                            size={2}
+                            placeholder="Time"
+                            className="form-control"
+                            name="time"
+                            type="number"
+                            min={1}
+                            max={12}
+                            step={1}
+                          />
+                          <span className="input-group-btn">Month{term > 1 ? 's' : ''}</span>
+                        </div>
+                      </div>
 
-                <div className="horizontal-slider-container">
-                  <ReactSlider
-                    className="horizontal-slider"
-                    thumbClassName="slider-thumb"
-                    trackClassName="slider-track"
-                    min={1}
-                    max={maxAmount}
-                    onChange={onSliderChange}
-                    value={amount}
-                    // renderThumb={(props, state) => <div {...props}></div>}
-                  />
-                  <div className="slider-percentages">
-                    <button onClick={() => handlePercentage(0)}>0%</button>
-                    <button onClick={() => handlePercentage(25)}>25%</button>
-                    <button onClick={() => handlePercentage(50)}>50%</button>
-                    <button onClick={() => handlePercentage(75)}>75%</button>
-                    <button onClick={() => handlePercentage(100)}>100%</button>
+                    </div>
+                    {userSettings.twoFAEnabled
+                      ? <div className="row no-gutters">
+                          <div className="col-5 col-sm-4">
+                            2FA
+                            <FormLabelDescription>2 Factor Authentication code</FormLabelDescription>
+                          </div>
+                          <div className="col-7 col-sm-8">
+                            <input
+                              {...bindTwoFACode}
+                              size={6}
+                              placeholder="2 Factor Authentication"
+                              className="form-control"
+                              name="twoFACode"
+                              type="number"
+                              minLength={6}
+                              maxLength={6}
+                            />
+                          </div>
+                        </div>
+                      : <div className="row no-gutters">
+                          <div className="col-5 col-sm-4">
+                            Password
+                            <FormLabelDescription>Your password</FormLabelDescription>
+                          </div>
+                          <div className="col-7 col-sm-8">
+                            <input
+                              {...bindPassword}
+                              size={6}
+                              placeholder="Password"
+                              className="form-control"
+                              name="password"
+                              type="password"
+                              minLength={8}
+                              autoComplete="new-password"
+                            />
+                          </div>
+                        </div>
+                    }
                   </div>
-                </div>
 
-                <div className="d-flex flex-row justify-content-between new-deposit-details">
-                  <div>
-                    <h5>Deposit details</h5>
-                    {/*<div>TIER: {currentTier}</div>
-                    <div>EAR: {ear}</div>
-                    <div>EIR: {eir}</div>
-                    <div>TEA: {tea}</div>*/}
-                    <div>Interest rate: <span className="text-white">{(parseFloat(eir) * 100).toFixed(6)}%</span></div>
-                    <div>Rewards: <span className="text-white"><FormattedAmount amount={(tea - amount)} /></span></div>
-                    <div>Fees: <span className="text-white"><FormattedAmount amount={depositFee}/></span></div>
-                    <div>Blockchain length: <span className="text-white">{time * depositBlocksPerMonth} blocks</span></div>
+                  <div className="horizontal-slider-container">
+                    <ReactSlider
+                      className="horizontal-slider"
+                      thumbClassName="slider-thumb"
+                      trackClassName="slider-track"
+                      min={1}
+                      max={maxAmount}
+                      onChange={onSliderChange}
+                      value={amount}
+                      // renderThumb={(props, state) => <div {...props}></div>}
+                    />
+                    <div className="slider-percentages">
+                      <button onClick={() => handlePercentage(0)}>0%</button>
+                      <button onClick={() => handlePercentage(25)}>25%</button>
+                      <button onClick={() => handlePercentage(50)}>50%</button>
+                      <button onClick={() => handlePercentage(75)}>75%</button>
+                      <button onClick={() => handlePercentage(100)}>100%</button>
+                    </div>
                   </div>
-                  <div>
-                    <button className="btn btn-outline-success">MAKE DEPOSIT</button>
+
+                  <div className="d-flex flex-row justify-content-between new-deposit-details">
+                    <div>
+                      <h5>Deposit details</h5>
+                      <div>Interest rate: <span className="text-white">{(eir * 100).toFixed(6)}%</span></div>
+                      <div>Rewards: <span className="text-white"><FormattedAmount amount={(tea - amount)} /></span></div>
+                      <div>Fees: <span className="text-white"><FormattedAmount amount={depositFee}/></span></div>
+                      <div>Blockchain length: <span className="text-white">{term * depositBlocksPerMonth} blocks</span></div>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={formSubmitted || !formValid}
+                        className={`btn ${formValid ? 'btn-outline-success' : 'btn-outline-danger'}`}
+                      >
+                        MAKE DEPOSIT
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </form>
               </div>
               <div className="col-lg-5">
                 <label className="section-title">Deposits History</label>
-                <div className="table-responsive">
-                  <table className="table table-striped table-hover mg-b-0">
-                    <thead>
-                      <tr>
-                        <th>Status</th>
-                        <th>Amount</th>
-                        <th>Unlock time</th>
-                        <th>Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Spent</td>
-                        <td>1234</td>
-                        <td></td>
-                        <td>Deposit</td>
-                      </tr>
-                      <tr>
-                        <td>Spent</td>
-                        <td>5678</td>
-                        <td></td>
-                        <td>Deposit</td>
-                      </tr>
-                      <tr>
-                        <td>Spent</td>
-                        <td>9012</td>
-                        <td></td>
-                        <td>Deposit</td>
-                      </tr>
-                      <tr>
-                        <td>Spent</td>
-                        <td>3456</td>
-                        <td></td>
-                        <td>Deposit</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                {deposits && deposits.length > 0
+                ? <div className="table-responsive">
+                    <table className="table table-striped table-hover mg-b-0">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Amount</th>
+                          <th>Unlock time</th>
+                          <th>Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deposits.map(deposit => {
+                          let status = 'Locked';
+                          let statusIcon = <></>
+                          if (network.blockchainHeight > deposit.unlockHeight) {
+                            status = 'Unlocked';
+                            statusIcon = <BiLockAlt />
+                          }
+                          if (deposit.spendingTransactionHash) {
+                            status = 'Spent';
+                            statusIcon = <BiLockOpenAlt />
+                          }
+                          const depositAmount = deposit.amount / Math.pow(10, coinDecimals);
+                          const blocksLeft = deposit.unlockHeight - network.blockchainHeight;
+
+                          return (
+                            <tr key={`tr-${deposit.creatingTransactionHash}`}>
+                              <td className="align-middle">
+                                {statusIcon} {status}
+                              </td>
+                              <td>
+                                <FormattedAmount amount={depositAmount} showCurrency={false} />
+                              </td>
+                              <td>
+                                {
+                                  moment(deposit.timestamp)
+                                    .add(blocksLeft * coinDifficultyTarget, 'seconds')
+                                    .format('YYYY-MM-DD HH:mm')
+                                }
+                              </td>
+                              <td>Deposit</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                : <div>You have no deposits yet.</div>
+                }
               </div>
             </div>
 
@@ -228,97 +311,83 @@ const Banking = () => {
             <div className="row">
               <div className="col-lg-12">
                 <label className="section-title">Current Deposits</label>
-                <div className="current-deposits">
-                  <ul className="list-group">
-                    <li className="list-group-item">
-                      <div className="d-flex flex-row justify-content-between current-deposit-details">
-                        <div className="current-deposit-start">
-                          Start Block: 23456
-                          <br />
-                          Start Date: 2020-02-01 00:00:01
-                          <br />
-                          Amount: 12345.00000 CCX
-                        </div>
-                        <div className="text-right current-deposit-end">
-                          End Block: 34567 <small>(23456 blocks left)</small>
-                          <br />
-                          Expected End Date: 2021-02-01 00:00:01
-                          <br />
-                          Interest: 12.34567 CCX <small>(0.21467%)</small>
-                        </div>
-                      </div>
-                      <div className="progress mg-b-10">
-                        <div
-                          className="progress-bar progress-bar-striped bg-warning wd-2p"
-                          role="progressbar"
-                          aria-valuenow="2"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        >
-                          2%
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item">
-                      <div className="d-flex flex-row justify-content-between current-deposit-details">
-                        <div className="current-deposit-start">
-                          Start Block: 12345
-                          <br />
-                          Start Date: 2020-01-01 00:00:01
-                          <br />
-                          Amount: 12345.00000 CCX
-                        </div>
-                        <div className="text-right current-deposit-end">
-                          End Block: 23456 <small>(12345 blocks left)</small>
-                          <br />
-                          Expected End Date: 2021-01-01 00:00:01
-                          <br />
-                          Interest: 12.34567 CCX <small>(0.21467%)</small>
-                        </div>
-                      </div>
-                      <div className="progress mg-b-10">
-                        <div
-                          className="progress-bar progress-bar-striped bg-warning wd-15p"
-                          role="progressbar"
-                          aria-valuenow="15"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        >
-                          15%
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item">
-                      <div className="d-flex flex-row justify-content-between current-deposit-details">
-                        <div className="current-deposit-start">
-                          Start Block: 54321
-                          <br />
-                          Start Date: 2019-07-01 00:00:01
-                          <br />
-                          Amount: 12345.00000 CCX
-                        </div>
-                        <div className="text-right current-deposit-end">
-                          End Block: 65432 <small>(123 blocks left)</small>
-                          <br />
-                          Expected End Date: 2020-07-01 00:00:01
-                          <br />
-                          Interest: 12.34567 CCX <small>(0.21467%)</small>
-                        </div>
-                      </div>
-                      <div className="progress mg-b-10">
-                        <div
-                          className="progress-bar progress-bar-striped bg-warning wd-85p"
-                          role="progressbar"
-                          aria-valuenow="85"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        >
-                          85%
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                {deposits && deposits.length > 0
+                  ? <div className="current-deposits">
+                      <ul className="list-group">
+                        {deposits.map(deposit => {
+                          /*
+                          Deposit info:
+                          Status: Locked
+                          Amount: 50.00 CCX
+                          Interest: 0.120833 CCX
+                          Sum: 50.120833 CCX
+                          Term interest rate: 0.241666 %
+                          Term: 21900
+                          Unlock height: 614708
+                          Expected unlock time: 2020-10-13 23:16
+                          Creating transaction: 699AB65D06BCF5A32FCBE69CCCDCC98896F63AC390D5126F267F184AFBB7595E
+                          Creating height: 592809
+                          Creating time: 2020-09-13 13:01
+                          Spending transaction: -
+                          Spending height: -
+                          Spending time: -
+                          */
+                          const depositAmount = deposit.amount / Math.pow(10, coinDecimals);
+
+                          let tier = 1;
+                          if (depositAmount >= 10000) tier = 2;
+                          if (depositAmount >= 30000) tier = 3;
+                          let depositTerm = deposit.term / depositBlocksPerMonth;
+                          const ear = tierCoeff[tier] + (depositTerm - 1) * 0.001;
+                          const eir = ear/12 * depositTerm;
+
+                          const depositInterest = deposit.interest / Math.pow(10, coinDecimals);
+                          const depositInterestPercentage = (eir * 100).toFixed(6);
+                          const totalBlocks = deposit.unlockHeight - deposit.height;
+                          const blocksLeft = deposit.unlockHeight - network.blockchainHeight;
+                          const progressPercentage = Math.floor(((totalBlocks - blocksLeft) / totalBlocks) * 100);
+                          const depositTimestamp = moment(deposit.timestamp).format('YYYY-MM-DD HH:mm UTC');
+                          const depositExpectedEnd = moment(deposit.timestamp)
+                            .add(blocksLeft * (coinDifficultyTarget + 5), 'seconds')
+                            .format('YYYY-MM-DD HH:mm UTC');
+                          return (
+                            <li key={`li-${deposit.creatingTransactionHash}`} className="list-group-item">
+                              <div className="d-flex flex-row justify-content-between current-deposit-details">
+                                <div className="current-deposit-start">
+                                  Creating height: {deposit.height.toLocaleString()}
+                                  <br/>
+                                  Start date: {depositTimestamp}
+                                  <br/>
+                                  Amount: <FormattedAmount amount={depositAmount}/>
+                                </div>
+                                <div className="text-right current-deposit-end">
+                                  Unlock height: {deposit.unlockHeight.toLocaleString()}&nbsp;
+                                  <small>({blocksLeft} blocks left)</small>
+                                  <br/>
+                                  Expected unlock time: {depositExpectedEnd}
+                                  <br/>
+                                  Interest: <FormattedAmount amount={depositInterest}/>&nbsp;
+                                  <small>({depositInterestPercentage}%)</small>
+                                </div>
+                              </div>
+                              <div className="progress mg-b-10">
+                                <div
+                                  className={`progress-bar progress-bar-striped bg-warning wd-${progressPercentage}p`}
+                                  role="progressbar"
+                                  aria-valuenow={progressPercentage}
+                                  aria-valuemin="0"
+                                  aria-valuemax="100"
+                                >
+                                  {progressPercentage}%
+                                </div>
+                              </div>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </div>
+                  : <div>You have no deposits yet.</div>
+                }
               </div>
             </div>
 

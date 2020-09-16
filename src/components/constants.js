@@ -16,6 +16,7 @@ export const constants = {
   updateMarketPricesInterval: 120,  // seconds
   maxWallets: 2,
   coinDecimals: 6,
+  coinDifficultyTarget: 120,  // seconds
   defaultFee: 0.001,
   messageFee: 0.001,
   selfDestructMessageFee: 0.001,

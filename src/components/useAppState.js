@@ -34,6 +34,7 @@ const initialState = Auth => ({
   },
   wallets: {},
   messages: {},
+  deposits: [],
   id: [],
   network: {
     blockchainHeight: 0,
@@ -185,6 +186,12 @@ const reducer = (state, action) => {
           ...state.layout,
           sendTxResponse: action.sendTxResponse,
         },
+      };
+      break;
+    case 'UPDATE_DEPOSITS':
+      result = {
+        ...state,
+        deposits: action.deposits,
       };
       break;
     case 'SET_ID':

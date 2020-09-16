@@ -408,6 +408,46 @@ const AppContextProvider = props => {
       .finally(() => dispatch({ type: 'FORM_SUBMITTED', value: false }));
   };
 
+  const getDeposits = () => {
+    Api.getDeposits()
+      .then(res => {
+        // console.log(res);
+        if (res.result === 'success') {
+          dispatch({ type: 'UPDATE_DEPOSITS', deposits: res.message.deposits });
+        }
+      })
+      .catch(e => console.error(e));
+  };
+
+  const createDeposit = (options, extras) => {
+    const { e, id } = options;
+    let message;
+    e.preventDefault();
+    dispatch({ type: 'FORM_SUBMITTED', value: true });
+    Api.createDeposit(options)
+      .then(res => {
+        if (res.result === 'success') {
+          dispatch({ type: 'UPDATE_DEPOSITS', deposits: res.message.deposits });
+          extras.forEach(fn => fn());
+        }
+      })
+      .catch(e => console.error(e))
+      .finally(() => {
+        dispatch({ type: 'FORM_SUBMITTED', value: false });
+        if (message) dispatch({ type: 'DISPLAY_MESSAGE', message, id });
+      });
+  };
+
+  const unlockDeposit = depositId => {
+    Api.unlockDeposit(depositId)
+      .then(res => {
+        if (res.result === 'success') {
+          dispatch({ type: 'UPDATE_DEPOSITS', deposits: res.message.deposits });
+        }
+      })
+      .catch(e => console.error(e));
+  };
+
   const getId = () => {
     Api.getId()
       .then(res => {
@@ -557,6 +597,9 @@ const AppContextProvider = props => {
     updateIPNConfig,
     getIPNClient,
     sendTx,
+    getDeposits,
+    createDeposit,
+    unlockDeposit,
     getId,
     checkId,
     createId,
@@ -576,6 +619,7 @@ const AppContextProvider = props => {
     const { appSettings, userSettings } = state;
 
     getUser();
+    getDeposits();
     getId();
     check2FA();
     getWallets();
