@@ -16,14 +16,17 @@ export const constants = {
   updateMarketPricesInterval: 120,  // seconds
   maxWallets: 2,
   coinDecimals: 6,
+  coinDifficultyTarget: 120,  // seconds
   defaultFee: 0.001,
   messageFee: 0.001,
   selfDestructMessageFee: 0.001,
   // feePerChar: 0.001,
-  depositFee: 0.001,
+  depositFee: 0.011,
   investmentFee: 0.001,
   withdrawalFee: 0.001,
   idFee: 20,
+  depositInterestRate: 0.2416,
+  depositBlocksPerMonth: 21900,
   messageLimit: 260,
   qrCodePrefix: 'conceal',
   donationURL: 'https://conceal.cloud/payment',
