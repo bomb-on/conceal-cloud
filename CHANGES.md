@@ -1,3 +1,13 @@
+#### 1.4.0 (2020-09-29)
+
+**Features**
+
+ - Added Banking
+ 
+**Bug Fixes**
+
+ - Fixed parsing the newly created wallet's balance
+
 #### 1.3.5 (2020-03-02)
 
 **Bug Fixes**
