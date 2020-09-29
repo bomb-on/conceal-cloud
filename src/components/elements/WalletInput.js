@@ -14,6 +14,7 @@ const WalletInput = (props) => {
     filterBy,
     hideAddon,
     inputName,
+    minLength,
     placeholder,
     setAddress,
     setSaveToAddressBook,
@@ -42,7 +43,7 @@ const WalletInput = (props) => {
         emptyLabel={emptyLabel || 'No records in Address Book.'}
         highlightOnlyResult
         selectHintOnEnter
-        minLength={1}
+        minLength={minLength}
         renderMenuItemChildren={option =>
           <>
             <strong className="addrDropdownLabel" key="name">
