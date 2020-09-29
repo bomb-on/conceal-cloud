@@ -146,7 +146,7 @@ const reducer = (state, action) => {
       };
       break;
     case 'CREATE_WALLET':
-      if (!(action.address in state.wallets)) state.wallets[action.address] = {};
+      if (!(action.address in state.wallets)) state.wallets[action.address] = { balance: 0 };
       result = {
         ...state,
         wallets: {
