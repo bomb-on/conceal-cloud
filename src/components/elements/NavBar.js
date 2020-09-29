@@ -17,6 +17,7 @@ import {
   FaTelegramPlane,
   FaTwitter
 } from 'react-icons/fa';
+import { AiOutlineBank } from 'react-icons/ai';
 
 import { AppContext } from '../ContextProvider';
 
@@ -37,8 +38,8 @@ const NavBar = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/address_book" className="nav-link hot_link" activeClassName="active">
-              <FaAddressBook /> <span>Address Book</span>
+            <NavLink to="/banking" className="nav-link hot_link" activeClassName="active">
+              <AiOutlineBank /> <span>Banking</span>
             </NavLink>
           </li>
           <li className="nav-item">
@@ -49,6 +50,11 @@ const NavBar = () => {
           <li className="nav-item">
             <NavLink to="/pay_settings" className="nav-link hot_link" activeClassName="active">
               <FaReceipt /> <span>Conceal Pay</span>
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/address_book" className="nav-link hot_link" activeClassName="active">
+              <FaAddressBook /> <span>Address Book</span>
             </NavLink>
           </li>
           <li className="nav-item">
