@@ -116,6 +116,7 @@ const Banking = () => {
                           hideAddon={true}
                           placeholder="Select wallet with enough funds"
                           setAddress={handleAddress}
+                          minLength={0}
                           wallets={
                             Object.keys(wallets).reduce((a, address) => {
                               if (wallets[address].balance > 1 + depositFee) a.push({ address });
@@ -315,23 +316,6 @@ const Banking = () => {
                   ? <div className="current-deposits">
                       <ul className="list-group">
                         {deposits.map(deposit => {
-                          /*
-                          Deposit info:
-                          Status: Locked
-                          Amount: 50.00 CCX
-                          Interest: 0.120833 CCX
-                          Sum: 50.120833 CCX
-                          Term interest rate: 0.241666 %
-                          Term: 21900
-                          Unlock height: 614708
-                          Expected unlock time: 2020-10-13 23:16
-                          Creating transaction: 699AB65D06BCF5A32FCBE69CCCDCC98896F63AC390D5126F267F184AFBB7595E
-                          Creating height: 592809
-                          Creating time: 2020-09-13 13:01
-                          Spending transaction: -
-                          Spending height: -
-                          Spending time: -
-                          */
                           const depositAmount = deposit.amount / Math.pow(10, coinDecimals);
 
                           let tier = 1;
@@ -372,7 +356,7 @@ const Banking = () => {
                               </div>
                               <div className="progress mg-b-10">
                                 <div
-                                  className={`progress-bar progress-bar-striped bg-warning wd-${progressPercentage}p`}
+                                  className={`progress-bar progress-bar-striped bg-warning wd-${Math.ceil(progressPercentage/5)*5}p`}
                                   role="progressbar"
                                   aria-valuenow={progressPercentage}
                                   aria-valuemin="0"
@@ -386,7 +370,7 @@ const Banking = () => {
                         })}
                       </ul>
                     </div>
-                  : <div>You have no deposits yet.</div>
+                  : <div>Once created and confirmed, your deposits will be listed here.</div>
                 }
               </div>
             </div>
