@@ -1,3 +1,9 @@
+#### 1.4.1 (2020-10-01)
+
+**Bug Fixes**
+
+ - Fixed incorrect calculations in Banking
+
 #### 1.4.0 (2020-09-29)
 
 **Features**
