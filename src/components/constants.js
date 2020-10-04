@@ -27,6 +27,8 @@ export const constants = {
   idFee: 20,
   depositInterestRate: 0.2416,
   depositBlocksPerMonth: 21900,
+  depositMinTerm: 1,  // months
+  depositMaxTerm: 12,  // months
   messageLimit: 260,
   qrCodePrefix: 'conceal',
   donationURL: 'https://conceal.cloud/payment',
