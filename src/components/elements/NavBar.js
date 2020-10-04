@@ -32,9 +32,9 @@ const NavBar = () => {
       <div className="container">
 
         <ul className="nav">
-          <li className="nav-item">
+          <li className="nav-item nav-item-small">
             <NavLink exact to="/dashboard" className="nav-link hot_link" activeClassName="active">
-              <FaHome /> <span>Dashboard</span>
+              <FaHome />
             </NavLink>
           </li>
           <li className="nav-item">
@@ -49,12 +49,12 @@ const NavBar = () => {
           </li>
           <li className="nav-item">
             <NavLink to="/pay_settings" className="nav-link hot_link" activeClassName="active">
-              <FaReceipt /> <span>Conceal Pay</span>
+              <FaReceipt /> <span>Pay</span>
             </NavLink>
           </li>
           <li className="nav-item">
             <NavLink to="/address_book" className="nav-link hot_link" activeClassName="active">
-              <FaAddressBook /> <span>Address Book</span>
+              <FaAddressBook /> <span>Contacts</span>
             </NavLink>
           </li>
           <li className="nav-item">
@@ -62,9 +62,9 @@ const NavBar = () => {
               <FaCog /> <span>Settings</span>
             </NavLink>
           </li>
-          <li className="nav-item with-sub">
+          <li className="nav-item with-sub nav-item-small">
             <button className="nav-link hot_link" data-toggle="dropdown">
-              <FaGlobe /> <span>Links</span>
+              <FaGlobe />
             </button>
             <div className="sub-item">
               <ul>
@@ -121,9 +121,9 @@ const NavBar = () => {
               </ul>
             </div>
           </li>
-          <li className="nav-item">
+          <li className="nav-item nav-item-small">
             <button className="nav-link hot_link" onClick={logoutUser}>
-              <FaSignOutAlt /> <span>Sign Out</span>
+              <FaSignOutAlt />
             </button>
           </li>
         </ul>

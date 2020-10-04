@@ -1212,8 +1212,17 @@ hr {
   max-width: 100%;
 }
 
+.nav-item-small {
+  flex: none !important;
+  width: 50px !important;
+}
+
 .nav-item.with-sub button {
   width: 100%;
+}
+
+.sub-item {
+
 }
 
 .nav-item.with-sub .sub-item,
