@@ -15,68 +15,81 @@ const Banking = () => {
   const { actions, state } = useContext(AppContext);
   const { createDeposit, getDeposits, unlockDeposit } = actions;
   const { appSettings, deposits, layout, network, userSettings, wallets } = state;
-  const { coinDecimals, coinDifficultyTarget, depositFee, depositBlocksPerMonth, depositInterestRate } = appSettings;
   const { formSubmitted, message } = layout;
+  const {
+    coinDecimals,
+    coinDifficultyTarget,
+    depositFee,
+    depositBlocksPerMonth,
+    depositInterestRate,
+    depositMinTerm,
+    depositMaxTerm,
+  } = appSettings;
 
   const { value: amount, bind: bindAmount, setValue: setAmount, reset: resetAmount } = useFormInput(1);
-  const { value: term, bind: bindTerm, reset: resetTerm } = useFormInput(1);
   const { value: twoFACode, bind: bindTwoFACode, reset: resetTwoFACode } = useFormInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useFormInput('');
 
   const tierCoeff = { 1: 0.029, 2: 0.039, 3: 0.049 };
   const [currentTier, setCurrentTier] = useState(1);
+  const [currentTerm, setCurrentTerm] = useState(1);
   const [eir, setEir] = useState(depositInterestRate);
   const [tea, setTea] = useState(amount);
   const [maxAmount, setMaxAmount] = useState(1);
   const [wallet, setWallet] = useState(1);
-
-  const handleTier = e => {
-    let tier = 1;
-    if (e.target.value >= 10000) tier = 2;
-    if (e.target.value >= 30000) tier = 3;
-    setCurrentTier(tier);
-  };
-
-  const onSliderChange = e => {
-    // console.log(e);
-    setAmount(e);
-  }
 
   const handleAddress = address => {
     if (wallets[address]) {
       setMaxAmount(Math.floor(wallets[address].balance - depositFee));
       setWallet(address);
     }
+  };
+
+  const handleTier = e => {
+    const val = e.target ? parseInt(e.target.value) : e;
+    let tier = 1;
+    if (val >= 10000) tier = 2;
+    if (val >= 20000) tier = 3;
+    setCurrentTier(tier);
+  };
+
+  const handleTerm = e => {
+    let t = e ? e.target.value : 1;
+    if (t < 1) t = depositMinTerm;
+    if (t > 12) t = depositMaxTerm;
+    setCurrentTerm(t);
   }
 
-  const handlePercentage = p => {
-    if (maxAmount > 1) {
-      // console.log(p);
-      const c = maxAmount * p / 100;
-      // console.log(c)
-      setAmount(maxAmount * p / 100);
-    }
-  }
+  const resetTerm = () => setCurrentTerm(1);
+
+  const onSliderChange = e => setAmount(parseInt(e));
+  const handlePercentage = p => maxAmount > 1 && setAmount(parseInt(maxAmount * p / 100));
+
+  const calculateDeposit = () => {
+    const ear = tierCoeff[currentTier] + (Number(currentTerm) - 1) * 0.001;
+    const eir = ear/12 * Number(currentTerm);
+    const tea = eir > 0 ? amount * (1 + eir) : 0;
+    setEir(eir);
+    setTea(tea);
+    handleTier(amount);
+  };
+
+  useEffect(() => {
+    calculateDeposit();
+  }, [amount, currentTier, currentTerm]);
 
   const formValidation = (
     wallet &&
-    maxAmount >= amount >= 1 &&
-    12 >= term >= 1 &&
+    amount >= 1 && amount <= maxAmount &&
+    currentTerm >= depositMinTerm && currentTerm <= depositMaxTerm &&
     twoFACode.length === 6
   );
 
   const formValid = useFormValidation(formValidation);
 
   useEffect(() => {
-    const ear = tierCoeff[currentTier] + (Number(term) - 1) * 0.001;
-    const eir = ear/12 * Number(term);
-    const tea = eir > 0 ? amount * (1 + eir) : 0;
-    setEir(eir);
-    setTea(tea);
-  }, [amount, term]);
-
-  useEffect(() => {
     getDeposits();
+    calculateDeposit();
   }, []);
 
   return (
@@ -98,7 +111,7 @@ const Banking = () => {
                 <label className="section-title">New Deposit</label>
                 <form
                   onSubmit={e => createDeposit(
-                    { e, amount, password, term: term * depositBlocksPerMonth, twoFACode, wallet, id: 'depositForm' },
+                    { e, amount, password, term: currentTerm * depositBlocksPerMonth, twoFACode, wallet, id: 'depositForm' },
                     [resetAmount, resetPassword, resetTerm, resetTwoFACode],
                   )}
                 >
@@ -135,7 +148,6 @@ const Banking = () => {
                         <div className="input-group">
                           <input
                             {...bindAmount}
-                            onKeyUp={handleTier}
                             size={2}
                             placeholder="Amount"
                             className="form-control"
@@ -143,7 +155,7 @@ const Banking = () => {
                             type="number"
                             min={0}
                             max={maxAmount}
-                            step={Math.pow(10, -coinDecimals).toFixed(coinDecimals)}
+                            step={1}
                           />
                           <span className="input-group-btn">CCX</span>
                         </div>
@@ -157,17 +169,18 @@ const Banking = () => {
                       <div className="col-7 col-sm-8">
                         <div className="input-group">
                           <input
-                            {...bindTerm}
-                            size={2}
+                            value={currentTerm}
+                            onChange={handleTerm}
                             placeholder="Time"
                             className="form-control"
                             name="time"
                             type="number"
-                            min={1}
-                            max={12}
+                            min={depositMinTerm}
+                            max={depositMaxTerm}
+                            size={2}
                             step={1}
                           />
-                          <span className="input-group-btn">Month{term > 1 ? 's' : ''}</span>
+                          <span className="input-group-btn">Month{currentTerm > 1 ? 's' : ''}</span>
                         </div>
                       </div>
 
@@ -220,8 +233,7 @@ const Banking = () => {
                       min={1}
                       max={maxAmount}
                       onChange={onSliderChange}
-                      value={amount}
-                      // renderThumb={(props, state) => <div {...props}></div>}
+                      value={amount <= maxAmount ? amount : 1}
                     />
                     <div className="slider-percentages">
                       <button onClick={() => handlePercentage(0)}>0%</button>
@@ -238,7 +250,7 @@ const Banking = () => {
                       <div>Interest rate: <span className="text-white">{(eir * 100).toFixed(6)}%</span></div>
                       <div>Rewards: <span className="text-white"><FormattedAmount amount={(tea - amount)} /></span></div>
                       <div>Fees: <span className="text-white"><FormattedAmount amount={depositFee}/></span></div>
-                      <div>Blockchain length: <span className="text-white">{term * depositBlocksPerMonth} blocks</span></div>
+                      <div>Blockchain length: <span className="text-white">{currentTerm * depositBlocksPerMonth} blocks</span></div>
                     </div>
                     <div>
                       <button
@@ -320,7 +332,7 @@ const Banking = () => {
 
                           let tier = 1;
                           if (depositAmount >= 10000) tier = 2;
-                          if (depositAmount >= 30000) tier = 3;
+                          if (depositAmount >= 20000) tier = 3;
                           let depositTerm = deposit.term / depositBlocksPerMonth;
                           const ear = tierCoeff[tier] + (depositTerm - 1) * 0.001;
                           const eir = ear/12 * depositTerm;

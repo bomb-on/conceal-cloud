@@ -46,6 +46,12 @@ const SendModal = props => {
   }, [coinDecimals, defaultFee, wallet]);
 
   useEffect(() => {
+    if (selectedWallet) {
+      setMaxValue((selectedWallet.balance - defaultFee).toFixed(coinDecimals));
+    }
+  }, [coinDecimals, defaultFee, selectedWallet]);
+
+  useEffect(() => {
     setPaymentIDValue(paymentIDValue);
   }, [paymentIDValue, setPaymentIDValue]);
 
