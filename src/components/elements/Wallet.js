@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FaArrowDown, FaArrowUp, FaComments, FaKey, FaListAlt, FaTrashAlt } from 'react-icons/fa';
+import { IoIosWarning } from 'react-icons/io';
 
 import { AppContext } from '../ContextProvider';
 import { FormattedAmount, maskAddress } from '../../helpers/utils';
@@ -34,24 +35,39 @@ const Wallet = props => {
     <div className="list-group-item">
       <div className="user-name-address">
         <p>{maskAddress(props.address)}</p>
-        <span>
-          Balance: <FormattedAmount amount={balanceTotal} />&nbsp;
-          {locked > 0 &&
-            <span className="tx-pending d-inline-block">
-              (Locked: <FormattedAmount amount={locked} showCurrency={false} />)
-            </span>
-          }
-        </span>
-        <span>Transactions in: {txIn.length.toLocaleString()}</span>
-        <span>Transactions out: {txOut.length.toLocaleString()}</span>
+        {wallet.corrupted
+          ? <>
+              <span>
+                <span className="text-danger">
+                  <IoIosWarning size="1rem" className="icon-warning" /> <strong>Wallet no longer available.</strong>
+                </span>
+                <span className="text-warning">
+                  Please import your previously exported keys to the desktop Conceal Wallet.
+                </span>
+              </span>
+            </>
+          : <>
+              <span>
+                Balance: <FormattedAmount amount={balanceTotal} />&nbsp;
+                {locked > 0 &&
+                  <span className="tx-pending d-inline-block">
+                    (Locked: <FormattedAmount amount={locked} showCurrency={false} />)
+                  </span>
+                }
+              </span>
+              <span>Transactions in: {txIn.length.toLocaleString()}</span>
+              <span>Transactions out: {txOut.length.toLocaleString()}</span>
+            </>
+        }
       </div>
+
       <div className="btn-group" role="group">
         <OverlayTrigger overlay={<Tooltip id={`${props.address}-send`}>Send CCX</Tooltip>}>
           <span>
             <button
               className={`btn btn-outline-dark ${!walletsLoaded || balanceTotal === 0 || balanceTotal === locked ? 'disabled' : ''}`}
               onClick={() => toggleSendModal(!sendModalOpen)}
-              disabled={!walletsLoaded || balanceTotal === 0 || balanceTotal === locked}
+              disabled={!walletsLoaded || balanceTotal === 0 || balanceTotal === locked || wallet.corrupted}
             >
               <FaArrowUp />
             </button>
@@ -62,7 +78,7 @@ const Wallet = props => {
           <button
             className={`btn btn-outline-dark ${!walletsLoaded ? 'disabled' : ''}`}
             onClick={() => toggleReceiveModal(!receiveModalOpen)}
-            disabled={!walletsLoaded}
+            disabled={!walletsLoaded || wallet.corrupted}
           >
             <FaArrowDown />
           </button>
@@ -72,7 +88,7 @@ const Wallet = props => {
           <button
             className={`btn btn-outline-dark ${!messagesLoaded ? 'disabled' : ''}`}
             onClick={() => toggleMessagesModal(!messagesModalOpen)}
-            disabled={!messagesLoaded}
+            disabled={!messagesLoaded || wallet.corrupted}
           >
             <FaComments />
           </button>
@@ -83,7 +99,7 @@ const Wallet = props => {
             <button
               className={`btn btn-outline-dark ${!walletsLoaded || txs.length === 0 ? 'disabled' : ''}`}
               onClick={() => toggleDetailsModal(!detailsModalOpen)}
-              disabled={!walletsLoaded || txs.length === 0}
+              disabled={!walletsLoaded || txs.length === 0 || wallet.corrupted}
             >
               <FaListAlt />
             </button>
@@ -94,7 +110,7 @@ const Wallet = props => {
           <button
             className={`btn btn-outline-dark ${!walletsLoaded ? 'disabled' : ''}`}
             onClick={() => toggleKeysModal(!keysModalOpen)}
-            disabled={!walletsLoaded}
+            disabled={!walletsLoaded || wallet.corrupted}
           >
             <FaKey />
           </button>
@@ -103,7 +119,7 @@ const Wallet = props => {
         <OverlayTrigger overlay={<Tooltip id={`${props.address}-delete`}>Delete Wallet</Tooltip>}>
           <span>
             <button
-              className={`btn btn-outline-dark ${!walletsLoaded || balanceTotal !== 0 ? 'disabled' : ''}`}
+              className={`btn btn-outline-${wallet.corrupted ? 'danger' : 'dark'} ${!walletsLoaded || balanceTotal !== 0 ? 'disabled' : ''}`}
               onClick={() => {
                 window.confirm('You are about to delete this wallet PERMANENTLY! Do you really wish to proceed?') &&
                 deleteWallet(props.address);

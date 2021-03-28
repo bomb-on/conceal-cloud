@@ -60,7 +60,6 @@ const Banking = () => {
     if (t > 12) t = depositMaxTerm;
     setCurrentTerm(t);
   }
-  console.log(deposits)
 
   const resetTerm = () => setCurrentTerm(1);
 
