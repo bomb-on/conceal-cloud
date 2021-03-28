@@ -6,7 +6,7 @@ import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 
 import MessageForm from '../elements/MessageForm';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
+// import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
 
 
 const MessagesModal = props => {
