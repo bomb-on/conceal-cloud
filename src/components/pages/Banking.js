@@ -16,7 +16,7 @@ const Banking = () => {
   const { actions, state } = useContext(AppContext);
   const { createDeposit, getDeposits, unlockDeposit } = actions;
   const { appSettings, deposits, layout, network, userSettings, wallets } = state;
-  const { formSubmitted, message } = layout;
+  const { formSubmitted } = layout;
   const {
     coinDecimals,
     coinDifficultyTarget,

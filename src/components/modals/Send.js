@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import {Hint, Typeahead} from 'react-bootstrap-typeahead';
+import { Typeahead } from 'react-bootstrap-typeahead';
 import QrReader from 'react-qr-reader';
 
 import { AppContext } from '../ContextProvider';
@@ -9,7 +9,6 @@ import WalletDropdown from '../elements/WalletDropdown';
 import { useFormInput, useSendFormValidation, useTypeaheadInput } from '../../helpers/hooks';
 import { FormattedAmount, maskAddress } from '../../helpers/utils';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-// import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
 
 
 const SendModal = props => {

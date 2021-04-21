@@ -31,7 +31,7 @@ const WalletInput = (props) => {
   return (
     <div className="input-group wallet-input-group">
       <Typeahead
-        ref={component => addressInput = component ? component.getInstance() : addressInput}
+        ref={component => addressInput === component ? component : addressInput}
         {...bindAddress}
         className={className || 'form-control'}
         id={inputName || 'address'}
