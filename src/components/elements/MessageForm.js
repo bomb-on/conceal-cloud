@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { createRef, useContext, useState } from 'react';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import WAValidator from 'multicoin-address-validator';
 
@@ -16,12 +16,14 @@ const MessageForm = props => {
   const { formSubmitted, sendMessageResponse } = layout;
   const { wallet } = props;
 
-  const { value: address, bind: bindAddress, reset: resetAddress } = useTypeaheadInput('');
+  const { value: address, bind: bindAddress } = useTypeaheadInput('');
   const { value: message, bind: bindMessage, reset: resetMessage } = useFormInput('');
   const { value: twoFACode, bind: bindTwoFACode, reset: resetTwoFACode } = useFormInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useFormInput('');
 
-  let addressInput = null;
+  const addressInput = createRef();
+  const resetAddressInput = () => addressInput.current.clear();
+
   const [sdm,] = useState(0);
 
   const totalMessageFee = message.length > 0 ? messageFee : 0;
@@ -45,24 +47,26 @@ const MessageForm = props => {
       <form
         className="send-form"
         onSubmit={e =>
-          sendMessage(
-            {
-              e,
-              wallet: props.address,
-              address,
-              message,
-              sdm,
-              twoFACode,
-              password,
-              id: 'sendMessageForm',
-            },
-            [
-              resetAddress,
-              resetMessage,
-              resetTwoFACode,
-              resetPassword,
-            ],
-          )
+          {
+            sendMessage(
+              {
+                e,
+                wallet: props.address,
+                address,
+                message,
+                sdm,
+                twoFACode,
+                password,
+                id: 'sendMessageForm',
+              },
+              [
+                resetMessage,
+                resetTwoFACode,
+                resetPassword,
+              ],
+            );
+            resetAddressInput();
+          }
         }
       >
         <div className="form-layout form-layout-7">
@@ -84,7 +88,7 @@ const MessageForm = props => {
             </div>
             <div className="col-7 col-sm-9">
               <Typeahead
-                ref={component => addressInput = component ? component.getInstance() : addressInput}
+                ref={addressInput}
                 {...bindAddress}
                 id="address"
                 labelKey="address"

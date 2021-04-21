@@ -23,7 +23,6 @@ const WalletInput = (props) => {
 
   const { value: address, bind: bindAddress } = useTypeaheadInput('');
 
-  let addressInput = null;
   const options = wallets || user.addressBook;
 
   useEffect(() => { setAddress(address) }, [address, setAddress]);
@@ -31,7 +30,6 @@ const WalletInput = (props) => {
   return (
     <div className="input-group wallet-input-group">
       <Typeahead
-        ref={component => addressInput === component ? component : addressInput}
         {...bindAddress}
         className={className || 'form-control'}
         id={inputName || 'address'}
