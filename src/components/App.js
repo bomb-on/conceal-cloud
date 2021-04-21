@@ -20,7 +20,7 @@ import Donate from './pages/Donate';
 import Pay from './pages/Pay';
 import PaySettings from './pages/PaySettings';
 import Id from './pages/Id';
-import Banking from './pages/Banking';
+import Deposits from './pages/Deposits';
 
 import '../static/css/slim.css';
 import '../static/css/slim.one.css';
@@ -40,7 +40,7 @@ const App = () => (
       <Route exact path="/terms" component={Terms} />
 
       <PrivateRoute exact path="/dashboard" component={Dashboard} />
-      <PrivateRoute exact path="/banking" component={Banking} />
+      <PrivateRoute exact path={["/banking", "/deposits"]} component={Deposits} />
       <PrivateRoute exact path="/id" component={Id} />
       <PrivateRoute exact path="/address_book" component={AddressBook} />
       <PrivateRoute exact path="/settings" component={Settings} />

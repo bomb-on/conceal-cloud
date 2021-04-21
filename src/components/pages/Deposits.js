@@ -12,7 +12,7 @@ import { FormattedAmount } from '../../helpers/utils';
 import WalletInput from '../elements/WalletInput';
 
 
-const Banking = () => {
+const Deposits = () => {
   const { actions, state } = useContext(AppContext);
   const { createDeposit, getDeposits, unlockDeposit } = actions;
   const { appSettings, deposits, layout, network, userSettings, wallets } = state;
@@ -101,9 +101,9 @@ const Banking = () => {
           <div className="slim-pageheader">
             <ol className="breadcrumb slim-breadcrumb">
               <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-              <li className="breadcrumb-item active" aria-current="page">Banking</li>
+              <li className="breadcrumb-item active" aria-current="page">Deposits</li>
             </ol>
-            <h6 className="slim-pagetitle">Banking</h6>
+            <h6 className="slim-pagetitle">Deposits</h6>
           </div>
 
           <div className="section-wrapper mg-t-20">
@@ -403,7 +403,7 @@ const Banking = () => {
             <hr />
 
             <div>
-              For more information about Conceal banking, please visit&nbsp;
+              For more information about Conceal deposits, please visit&nbsp;
               <a href="https://conceal.network/wiki/doku.php?id=banking" target="_blank" rel="noopener noreferrer">Conceal Wiki</a>.
             </div>
           </div>
@@ -414,4 +414,4 @@ const Banking = () => {
   );
 }
 
-export default Banking;
+export default Deposits;

@@ -38,8 +38,8 @@ const NavBar = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/banking" className="nav-link hot_link" activeClassName="active">
-              <AiOutlineBank /> <span>Banking</span>
+            <NavLink to="/deposits" className="nav-link hot_link" activeClassName="active">
+              <AiOutlineBank /> <span>Deposits</span>
             </NavLink>
           </li>
           <li className="nav-item">
