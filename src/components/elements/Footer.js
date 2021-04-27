@@ -14,7 +14,7 @@ const Footer = () => {
         <p>
           Copyright 2019 &copy; All Rights Reserved. Conceal Network | <Link to="/terms">Terms &amp; Conditions</Link>
         </p>
-        <p>Version: {appSettings.appVersion} | Last Update: {layout.lastUpdate.toUTCString()}</p>
+        <p>Version: <a href="https://github.com/ConcealNetwork/conceal-cloud/blob/master/CHANGES.md" target="_blank" rel="noopener noreferrer">{appSettings.appVersion}</a> | Last Update: {layout.lastUpdate.toUTCString()}</p>
       </div>
     </div>
   )
