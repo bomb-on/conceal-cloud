@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Moment from 'react-moment';
+import moment from 'moment';
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 
 import MessageForm from '../elements/MessageForm';
@@ -52,9 +53,9 @@ const MessagesModal = props => {
         <label className="section-title d-inline-block">Your Messages</label>
         <div className="list-group tx-details">
           {filteredMessages.length > 0 && filteredMessages
-            .sort((a, b) => (new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
+            .sort((a, b) => (moment(b.timestamp).unix() - moment(a.timestamp).unix()))
             .map(message =>
-              <div key={new Date(message.timestamp).getTime()} className="list-group-item pd-y-20">
+              <div key={moment(message.timestamp).unix()} className="list-group-item pd-y-20">
                 <div className="media">
                   <div className="d-flex mg-r-10 wd-50">
                     {message.type === 'in'
