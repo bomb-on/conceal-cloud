@@ -21,6 +21,7 @@ import Pay from './pages/Pay';
 import PaySettings from './pages/PaySettings';
 import Id from './pages/Id';
 import Deposits from './pages/Deposits';
+import Policy from './pages/Policy';
 
 import '../static/css/slim.css';
 import '../static/css/slim.one.css';
@@ -38,6 +39,7 @@ const App = () => (
       <Route exact path="/reset_password" component={ResetPassword} />
       <Route exact path="/reset_password/:token" component={ResetPassword} />
       <Route exact path="/terms" component={Terms} />
+      <Route exact path="/privacy_policy" component={Policy} />
 
       <PrivateRoute exact path="/dashboard" component={Dashboard} />
       <PrivateRoute exact path={["/banking", "/deposits"]} component={Deposits} />
