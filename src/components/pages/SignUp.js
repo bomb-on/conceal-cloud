@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
@@ -23,7 +23,7 @@ const SignUp = () => {
   );
   const formValid = useFormValidation(formValidation);
 
-  if (user.loggedIn()) return <Redirect to="/" />;
+  if (user.loggedIn()) return <Navigate to="/" />;
 
   return (
     <div className="signin-wrapper">

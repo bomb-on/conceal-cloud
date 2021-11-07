@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
 
 
-const Login = props => {
+const Login = () => {
+  const location = useLocation();
   const { actions, state } = useContext(AppContext);
   const { loginUser } = actions;
   const { layout, user, userSettings } = state;
@@ -22,12 +23,12 @@ const Login = props => {
   );
   const formValid = useFormValidation(formValidation);
 
-  if (redirectToReferrer && props.location.state && user.loggedIn()) {
-    const { from } = props.location.state;
-    return <Redirect to={from} />;
+  if (redirectToReferrer && location.state && user.loggedIn()) {
+    const { from } = location.state;
+    return <Navigate to={from} />;
   }
 
-  if (user.loggedIn()) return <Redirect to="/dashboard" />;
+  if (user.loggedIn()) return <Navigate to="/dashboard" />;
 
   return (
     <div className="signin-wrapper">
@@ -37,9 +38,9 @@ const Login = props => {
         <h2 className="signin-title-primary">Welcome back!</h2>
         <h3 className="signin-title-secondary">Sign in to continue.</h3>
 
-        {(message.loginForm || message.signUpForm) &&
+        {(message.loginForm || message.signUpForm || message.resetPasswordForm) &&
           <div className="alert alert-outline alert-danger text-center">
-            {message.loginForm || message.signUpForm}
+            {message.loginForm || message.signUpForm || message.resetPasswordForm}
           </div>
         }
 

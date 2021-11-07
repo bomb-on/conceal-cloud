@@ -33,32 +33,32 @@ const NavBar = () => {
 
         <ul className="nav">
           <li className="nav-item nav-item-small">
-            <NavLink exact to="/dashboard" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/dashboard" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <FaHome />
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/deposits" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/deposits" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <AiOutlineBank /> <span>Deposits</span>
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/id" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/id" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <FaIdCard /> <span>Id</span>
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/pay_settings" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/pay_settings" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <FaReceipt /> <span>Pay</span>
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/address_book" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/address_book" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <FaAddressBook /> <span>Contacts</span>
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/settings" className="nav-link hot_link" activeClassName="active">
+            <NavLink to="/settings" className={({ isActive }) => 'nav-link hot_link' + (isActive ? ' active': '')}>
               <FaCog /> <span>Settings</span>
             </NavLink>
           </li>

@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
 
 
-const ResetPassword = props => {
+const ResetPassword = () => {
+  const [searchParams] = useSearchParams();
   const { actions, state } = useContext(AppContext);
   const { resetPassword, resetPasswordConfirm } = actions;
   const { layout, user, userSettings } = state;
@@ -16,7 +17,7 @@ const ResetPassword = props => {
   const { value: passwordConfirm, bind: bindPasswordConfirm } = useFormInput('');
 
   const formValidation = (
-    props.match.params.token
+    searchParams.token
       ? password !== '' && password.length >= userSettings.minimumPasswordLength &&
         passwordConfirm !== '' && passwordConfirm.length >= userSettings.minimumPasswordLength &&
         password === passwordConfirm
@@ -24,7 +25,7 @@ const ResetPassword = props => {
   );
   const formValid = useFormValidation(formValidation);
 
-  if (user.loggedIn()) return <Redirect to="/" />;
+  if (user.loggedIn()) return <Navigate to="/" />;
 
   return (
     <div className="signin-wrapper">
@@ -37,13 +38,13 @@ const ResetPassword = props => {
           <div className="alert alert-outline alert-danger text-center">{message.resetPasswordForm}</div>
         }
 
-        {props.match.params.token
+        {searchParams.token
           ? <form
               onSubmit={e =>
                 resetPasswordConfirm({
                   e,
                   password,
-                  token: props.match.params.token,
+                  token: searchParams.token,
                   id: 'resetPasswordConfirmForm',
                 })
               }

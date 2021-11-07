@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ReactNotification from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css';
 import 'animate.css/animate.min.css';
@@ -32,26 +32,27 @@ const App = () => (
   <Router>
     <AppContextProvider>
       <ReactNotification />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset_password" element={<ResetPassword />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy_policy" element={<Policy />} />
 
-      <Route exact path="/" component={Home} />
-      <Route exact path="/signup" component={SignUp} />
-      <Route exact path="/login" component={Login} />
-      <Route exact path="/reset_password" component={ResetPassword} />
-      <Route exact path="/reset_password/:token" component={ResetPassword} />
-      <Route exact path="/terms" component={Terms} />
-      <Route exact path="/privacy_policy" component={Policy} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/banking" element={<PrivateRoute><Deposits /></PrivateRoute>} />
+        <Route path="/deposits" element={<PrivateRoute><Deposits /></PrivateRoute>} />
+        <Route path="/id" element={<PrivateRoute><Id /></PrivateRoute>} />
+        <Route path="/address_book" element={<PrivateRoute><AddressBook /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+        <Route path="/pay_settings" element={<PrivateRoute><PaySettings /></PrivateRoute>} />
+        <Route path="/getting_started" element={<PrivateRoute><GettingStarted /></PrivateRoute>} />
+        <Route path="/upcoming_features" element={<PrivateRoute><UpcomingFeatures /></PrivateRoute>} />
+        <Route path="/payment/" element={<PrivateRoute><Donate /></PrivateRoute>} />
+        <Route path="/pay/" element={<PrivateRoute><Pay /></PrivateRoute>} />
 
-      <PrivateRoute exact path="/dashboard" component={Dashboard} />
-      <PrivateRoute exact path={["/banking", "/deposits"]} component={Deposits} />
-      <PrivateRoute exact path="/id" component={Id} />
-      <PrivateRoute exact path="/address_book" component={AddressBook} />
-      <PrivateRoute exact path="/settings" component={Settings} />
-      <PrivateRoute exact path="/pay_settings" component={PaySettings} />
-      <PrivateRoute exact path="/getting_started" component={GettingStarted} />
-      <PrivateRoute exact path="/upcoming_features" component={UpcomingFeatures} />
-      <PrivateRoute exact path="/payment/:address?/:recipientName?" component={Donate} />
-      <PrivateRoute exact strict path="/pay/" component={Pay} />
-
+      </Routes>
     </AppContextProvider>
   </Router>
 );
