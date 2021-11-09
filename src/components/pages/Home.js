@@ -16,7 +16,8 @@ import {
 import AOS from 'aos';
 
 import { AppContext } from '../ContextProvider';
-import { useAddToHomescreenPrompt } from "../../helpers/HomeScreen";
+import { useAddToHomescreenPrompt } from '../../helpers/HomeScreen';
+import 'animate.css/animate.min.css';
 
 import landingImg1 from '../../static/img/landing_img1.jpg';
 import landingImg2 from '../../static/img/landing_img2.jpg';

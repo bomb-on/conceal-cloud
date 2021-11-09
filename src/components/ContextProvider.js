@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import AuthHelper from '../helpers/AuthHelper';
 import ApiHelper from '../helpers/ApiHelper';
 import useAppState from './useAppState';
 import { NewTxMessage, TxSentMessage } from './elements/NotificationMessages';
+import { useMountEffect } from '../helpers/hooks';
 import { showNotification } from '../helpers/utils';
 
 
@@ -669,7 +670,12 @@ const AppContextProvider = props => {
     dispatch({ type: 'REDIRECT_TO_REFERRER', value: false });
   };
 
-  const onRouteChanged = () => {
+  useMountEffect(() => {
+    if (state.user.loggedIn()) initApp();
+    return () => clearApp();
+  });
+
+  useMountEffect(() => {
     if (!['/reset_password', '/signup'].includes(location.pathname)) {
       dispatch({ type: 'DISPLAY_MESSAGE', message: null });
     }
@@ -677,14 +683,7 @@ const AppContextProvider = props => {
       const message = (<>Account successfully activated.<br />Please log in.</>);
       dispatch({ type: 'DISPLAY_MESSAGE', message, id: 'loginForm' });
     }
-  };
-
-  useEffect(() => {
-    if (state.user.loggedIn()) initApp();
-    return () => clearApp();
-  }, []);
-
-  useEffect(() => onRouteChanged(), []);
+  });
 
   return (
     <AppContext.Provider value={{ state, actions }}>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ReactNotification from 'react-notifications-component'
-import 'react-notifications-component/dist/theme.css';
-import 'animate.css/animate.min.css';
 
 import AppContextProvider from './ContextProvider';
 import Home from './pages/Home';
@@ -23,6 +21,7 @@ import Id from './pages/Id';
 import Deposits from './pages/Deposits';
 import Policy from './pages/Policy';
 
+import 'react-notifications-component/dist/theme.css';
 import '../static/css/slim.css';
 import '../static/css/slim.one.css';
 import '../static/css/font-awesome-animation.min.css';
@@ -51,7 +50,6 @@ const App = () => (
         <Route path="/upcoming_features" element={<PrivateRoute><UpcomingFeatures /></PrivateRoute>} />
         <Route path="/payment/" element={<PrivateRoute><Donate /></PrivateRoute>} />
         <Route path="/pay/" element={<PrivateRoute><Pay /></PrivateRoute>} />
-
       </Routes>
     </AppContextProvider>
   </Router>
