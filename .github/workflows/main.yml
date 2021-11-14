@@ -18,6 +18,7 @@ env:
 
 jobs:
   prepare:
+    if: contains(github.event.pull_request.labels.*.name, 'PR approved')
     name: Prepare Deployment
     runs-on: ubuntu-latest
     outputs:
