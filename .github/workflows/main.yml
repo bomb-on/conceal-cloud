@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master, develop ]
   pull_request_target:
-    types: [ assigned, opened, synchronize, reopened, labeled ]
+    types: [ labeled ]
   create:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
@@ -18,7 +18,7 @@ env:
 
 jobs:
   prepare:
-    if: contains(github.event.pull_request.labels.*.name, 'PR approved')
+    if: github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'PR approved')
     name: Prepare Deployment
     runs-on: ubuntu-latest
     outputs:
