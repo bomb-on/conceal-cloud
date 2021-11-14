@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import Link from 'react-router-dom/Link';
+import { Link } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
 import IdCard from '../elements/IdCard';

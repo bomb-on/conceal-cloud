@@ -1,0 +1,104 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+  create:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  prepare:
+    name: Prepare Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      git_branch: ${{ steps.git_branch.outputs.git_branch }}
+      nodejs_version: ${{ steps.nodejs_version.outputs.nodejs_version }}
+      short_sha: ${{ steps.short_sha.outputs.short_sha }}
+      tagged_version: ${{ steps.tagged_version.outputs.tagged_version }}
+    steps:
+      - name: Sync Repository
+        uses: actions/checkout@v2
+      - name: Set Branch Name
+        id: git_branch
+        run: echo ::set-output name=git_branch::$(echo ${GITHUB_REF##*/})
+      - name: Set NodeJS Version
+        id: nodejs_version
+        run: echo ::set-output name=nodejs_version::$(cat .nvmrc)
+      - name: Set Short SHA
+        id: short_sha
+        run: echo ::set-output name=short_sha::$(git rev-parse --short HEAD)
+      - name: Set Tagged Version
+        id: tagged_version
+        run: |
+          if [[ ${{ github.ref }} =~ refs\/tags\/[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::set-output name=tagged_version::true"
+          else
+            echo "::set-output name=tagged_version::false"
+          fi
+
+  deploy_production:
+    needs: prepare
+    if: needs.prepare.outputs.git_branch == 'master' && needs.prepare.outputs.tagged_version == 'true'
+    environment: production
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Repository
+        uses: actions/checkout@v2
+      - name: Configure NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ needs.prepare.outputs.nodejs_version }}
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps --only=production
+      - name: Build Version
+        env:
+          REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+        run: npm run build
+      - name: Upload to S3 Bucket
+        run: aws s3 cp --recursive . s3://conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
+      - name: Invalidate Caches
+        run: |
+          aws configure set preview.cloudfront true
+          aws cloudfront create-invalidation --distribution-id "${{ secrets.CF_DISTRIBUTION_ID }}" --paths "/*"
+      - name: Prepare Release Notes
+        id: release_notes
+        run: grep -ozP "(?<=#### ${GITHUB_REF##*/}).*\n\n\K(.|\n)*?(?=\n####)" CHANGES.md | tr '\0' '\n' > release_notes.txt
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.txt
+
+  deploy_staging:
+    needs: prepare
+    if: needs.prepare.outputs.git_branch != 'master' && needs.prepare.outputs.tagged_version == 'false'
+    environment: staging
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Repository
+        uses: actions/checkout@v2
+      - name: Configure NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ needs.prepare.outputs.nodejs_version }}
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+      - name: Build Version
+        env:
+          REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+        run: npm run build
+      - name: Upload to S3 Bucket
+        run: aws s3 cp --recursive . s3://staging.conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
+      - name: Invalidate Caches
+        run: |
+          aws configure set preview.cloudfront true
+          aws cloudfront create-invalidation --distribution-id "${{ secrets.CF_DISTRIBUTION_ID }}" --paths "/*"

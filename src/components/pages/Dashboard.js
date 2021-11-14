@@ -12,7 +12,7 @@ import MarketStats from '../cards/MarketStats';
 import ImportWalletModal from '../modals/ImportWallet';
 
 
-const Dashboard = props => {
+const Dashboard = () => {
   const { actions, state, ...rest } = useContext(AppContext);
   const { createWallet } = actions;
   const { appSettings, layout, messages, wallets } = state;

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import WAValidator from 'multicoin-address-validator';
 
 import { AppContext } from '../ContextProvider';
@@ -8,20 +9,20 @@ import { useCalculatedValues, useFormInput, useSendFormValidation } from '../../
 import { FormattedAmount } from '../../helpers/utils';
 
 
-const Donate = props => {
+const Donate = () => {
+  const [searchParams] = useSearchParams();
   const { actions, state } = useContext(AppContext);
   const { sendTx } = actions;
   const { appSettings, layout, marketData, userSettings, wallets } = state;
   const { coinDecimals, defaultFee, messageLimit } = appSettings;
   const { formSubmitted, walletsLoaded } = layout;
 
-  const params = new URLSearchParams(props.location.search);
-  const address = params.get('address') || props.match.params.address;
+  const address = searchParams.get('address') || '';
   const addressValid = WAValidator.validate(address, 'CCX');
-  const recipientName = params.get('recipientName') || props.match.params.recipientName;
+  const recipientName = searchParams.get('recipientName') || '';
 
-  const { value: amount, bind: bindAmount, reset: resetAmount } = useFormInput(params.get('amount') || '');
-  const { value: message, bind: bindMessage, reset: resetMessage } = useFormInput(params.get('message') || '');
+  const { value: amount, bind: bindAmount, reset: resetAmount } = useFormInput(searchParams.get('amount') || '');
+  const { value: message, bind: bindMessage, reset: resetMessage } = useFormInput(searchParams.get('message') || '');
   const { value: twoFACode, bind: bindTwoFACode, reset: resetTwoFACode } = useFormInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useFormInput('');
   const { btcValue, usdValue } = useCalculatedValues(amount, marketData);

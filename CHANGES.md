@@ -1,4 +1,10 @@
-#### 1.4.2
+#### 1.4.3 (2021-11-14)
+
+**Features**
+
+ - Added GitHub Actions workflow for automated deployments
+
+#### 1.4.2 (2021-11-07)
 
 **Features**
 
@@ -12,13 +18,13 @@
  - Fixed errors in case wallet gets corrupted
  - Fixed an issue with `<div>` IDs in Messages
 
-#### 1.4.1 (2020-10-01)
+#### 1.4.1 (2021-10-01)
 
 **Bug Fixes**
 
  - Fixed incorrect calculations in Banking
 
-#### 1.4.0 (2020-09-29)
+#### 1.4.0 (2021-09-29)
 
 **Features**
 
