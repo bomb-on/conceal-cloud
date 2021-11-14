@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
   FaBars,
   FaCloudDownloadAlt,
@@ -16,7 +16,8 @@ import {
 import AOS from 'aos';
 
 import { AppContext } from '../ContextProvider';
-import { useAddToHomescreenPrompt } from "../../helpers/HomeScreen";
+import { useAddToHomescreenPrompt } from '../../helpers/HomeScreen';
+import 'animate.css/animate.min.css';
 
 import landingImg1 from '../../static/img/landing_img1.jpg';
 import landingImg2 from '../../static/img/landing_img2.jpg';
@@ -25,7 +26,8 @@ import landingImg4 from '../../static/img/landing_img4.jpg';
 import landingImg5 from '../../static/img/landing_img5.jpg';
 import landingImg6 from '../../static/img/landing_img6.jpg';
 
-const Home = props => {
+const Home = () => {
+  const location = useLocation();
   const [getIsVisible, promptToInstall] = useAddToHomescreenPrompt();
   const { state } = useContext(AppContext);
   const { layout, user } = state;
@@ -84,12 +86,12 @@ const Home = props => {
     }
   }*/
 
-  if (redirectToReferrer && props.location.state && user.loggedIn()) {
-    const { from } = props.location.state;
-    return <Redirect to={from} />;
+  if (redirectToReferrer && location.state && user.loggedIn()) {
+    const { from } = location.state;
+    return <Navigate to={from} />;
   }
 
-  if (user.loggedIn()) return <Redirect to="/dashboard" />;
+  if (user.loggedIn()) return <Navigate to="/dashboard" />;
 
   return (
     <div className="landing-site-wrap">

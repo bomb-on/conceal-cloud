@@ -6,10 +6,10 @@ import { BiLockAlt, BiLockOpenAlt } from 'react-icons/bi';
 import { RiHandCoinLine } from 'react-icons/ri';
 
 import { AppContext } from '../ContextProvider';
-import { useFormInput, useFormValidation } from '../../helpers/hooks';
 import FormLabelDescription from '../elements/FormLabelDescription';
-import { FormattedAmount } from '../../helpers/utils';
 import WalletInput from '../elements/WalletInput';
+import { useFormInput, useFormValidation, useMountEffect } from '../../helpers/hooks';
+import { FormattedAmount } from '../../helpers/utils';
 
 
 const Deposits = () => {
@@ -88,10 +88,10 @@ const Deposits = () => {
 
   const formValid = useFormValidation(formValidation);
 
-  useEffect(() => {
+  useMountEffect(() => {
     getDeposits();
     calculateDeposit();
-  }, []);
+  });
 
   return (
     <div>

@@ -23,7 +23,7 @@ const DonationForm = () => {
 
   useEffect(() => {
     let url = appSettings.donationURL;
-    if (donationWallet) url = `${url}/?address=${donationWallet}`;
+    if (donationWallet) url = `${url} ?address=${donationWallet}`;
     if (recipientName) url = `${url}&recipientName=${encodeURIComponent(recipientName)}`;
     if (amount) url = `${url}&amount=${encodeURIComponent(amount)}`;
     if (message) url = `${url}&message=${encodeURIComponent(message)}`;
