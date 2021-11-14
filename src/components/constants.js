@@ -1,5 +1,6 @@
 export const constants = {
   appVersion: process.env.REACT_APP_VERSION,
+  appShortSha: process.env.REACT_APP_VERSION_SHORT_SHA,
   apiURL: process.env.REACT_APP_API_ENDPOINT,
   homePage: 'https://conceal.network',
   explorerURL: 'https://explorer.conceal.network',
