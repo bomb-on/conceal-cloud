@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
 import FormLabelDescription from '../elements/FormLabelDescription';
@@ -7,7 +8,8 @@ import { useCalculatedValues, useFormInput, useSendFormValidation } from '../../
 import { FormattedAmount } from '../../helpers/utils';
 
 
-const Pay = props => {
+const Pay = () => {
+  const [searchParams] = useSearchParams();
   const { actions, state } = useContext(AppContext);
   const { sendTx } = actions;
   const { appSettings, layout, marketData, userSettings, wallets } = state;
@@ -21,10 +23,9 @@ const Pay = props => {
     }, 10 * 1000);
   }
 
-  const params = new URLSearchParams(props.location.search);
-  const client = params.get('client');
-  const ref = params.get('ref');
-  const amountPredefined = params.get('amount');
+  const client = searchParams.get('client') || '';
+  const ref = searchParams.get('ref') || '';
+  const amountPredefined = searchParams.get('amount') || '';
 
   const { value: amount, reset: resetAmount, setValue: setAmountValue } = useFormInput(0);
   const { value: message, bind: bindMessage, reset: resetMessage } = useFormInput('');

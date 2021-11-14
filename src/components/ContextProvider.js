@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { withRouter } from 'react-router';
+import React from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import AuthHelper from '../helpers/AuthHelper';
 import ApiHelper from '../helpers/ApiHelper';
 import useAppState from './useAppState';
 import { NewTxMessage, TxSentMessage } from './elements/NotificationMessages';
+import { useMountEffect } from '../helpers/hooks';
 import { showNotification } from '../helpers/utils';
 
 
@@ -12,6 +13,9 @@ export const AppContext = React.createContext();
 const Auth = new AuthHelper();
 
 const AppContextProvider = props => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [state, dispatch, updatedState] = useAppState(Auth);
   const Api = new ApiHelper({ Auth, state });
 
@@ -42,7 +46,7 @@ const AppContextProvider = props => {
         message = res.message;
         if (res.result === 'success') {
           message = 'Please check your email and follow the instructions to activate your account.';
-          return props.history.replace('/login');
+          return navigate('/login');
         }
       })
       .catch(err => { message = `ERROR ${err}` })
@@ -64,7 +68,7 @@ const AppContextProvider = props => {
           message = 'Please check your email and follow instructions to reset password.';
           Auth.logout();
           clearApp();
-          props.history.replace('/');
+          navigate('/login');
         }
       })
       .catch(err => { message = `ERROR ${err}` })
@@ -84,7 +88,7 @@ const AppContextProvider = props => {
         message = res.message;
         if (res.result === 'success') {
           message = (<>Password successfully changed.<br />Please log in.</>);
-          return props.history.replace('/login');
+          return navigate('/login');
         }
       })
       .catch(err => { message = `ERROR ${err}` })
@@ -97,7 +101,7 @@ const AppContextProvider = props => {
   const logoutUser = () => {
     clearApp();
     Auth.logout();
-    return props.history.replace('/');
+    return navigate('/login');
   };
 
   const getUser = () => {
@@ -244,7 +248,6 @@ const AppContextProvider = props => {
   };
 
   const getWallets = () => {
-    const { location } = props;
     let message;
     Api.getWallets()
       .then(res => {
@@ -620,7 +623,6 @@ const AppContextProvider = props => {
   };
 
   const initApp = () => {
-    const { location } = props;
     const { appSettings, userSettings } = state;
 
     getUser();
@@ -650,16 +652,14 @@ const AppContextProvider = props => {
       )
     }
 
-    if (location.state && location.state.from.pathname.startsWith('/pay/')) {
-      const params = new URLSearchParams(location.state.from.search);
-      const client = params.get('client');
-      if (client) getIPNClient(client);
-    }
-
-    if (location.pathname.startsWith('/pay/')) {
-      const params = new URLSearchParams(props.location.search);
-      const client = params.get('client');
-      if (client) getIPNClient(client);
+    if (
+      searchParams.get('client') &&
+      (
+        (location.state && location.state.from.match(/\/pay\/?$/)) ||
+        location.pathname.match(/\/pay\/?$/)
+      )
+    ) {
+      getIPNClient(searchParams.get('client'));
     }
 
     dispatch({ type: 'SET_INTERVALS', intervals });
@@ -670,24 +670,20 @@ const AppContextProvider = props => {
     dispatch({ type: 'REDIRECT_TO_REFERRER', value: false });
   };
 
-  const onRouteChanged = props => {
-    const { location } = props;
-    const isRedirect = props.history.action === 'REPLACE';
-    if (location.pathname !== '/signup' && !location.pathname.startsWith('/reset_password') && (location.pathname === '/login' && !isRedirect)) {
+  useMountEffect(() => {
+    if (state.user.loggedIn()) initApp();
+    return () => clearApp();
+  });
+
+  useMountEffect(() => {
+    if (!['/reset_password', '/signup'].includes(location.pathname)) {
       dispatch({ type: 'DISPLAY_MESSAGE', message: null });
     }
     if (location.pathname === '/login' && location.search === '?activated') {
       const message = (<>Account successfully activated.<br />Please log in.</>);
-      dispatch({ type: 'DISPLAY_MESSAGE', message });
+      dispatch({ type: 'DISPLAY_MESSAGE', message, id: 'loginForm' });
     }
-  };
-
-  useEffect(() => {
-    if (state.user.loggedIn()) initApp();
-    return () => clearApp();
-  }, []);
-
-  useEffect(() => onRouteChanged(props), [props.location]);
+  });
 
   return (
     <AppContext.Provider value={{ state, actions }}>
@@ -696,4 +692,4 @@ const AppContextProvider = props => {
   )
 };
 
-export default withRouter(AppContextProvider);
+export default AppContextProvider;

@@ -1,13 +1,10 @@
 # Conceal Cloud
 
-> Work in progress...
 
-### Usage
+### Development
 
 Requirements:
- - NodeJS (v14 or higher)
-
-#### Development
+- NodeJS (v17 or higher)
 
 Clone repository:
 ```bash
