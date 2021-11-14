@@ -90,10 +90,12 @@ const Login = props => {
         <p className="mg-b-0">Forgot your password? <Link to="/reset_password">Reset It</Link></p>
         <hr />
         <p className="mg-b-0 box-footer">
-          Copyright 2019 &copy; All Rights Reserved. Conceal Network<br /><Link to="/terms">Terms &amp; Conditions</Link>
+          Copyright 2019 &copy; All Rights Reserved. Conceal Network<br />
+          <Link to="/terms">Terms &amp; Conditions</Link><br />
+          <Link to="/privacy_policy">Privacy Policy</Link>
         </p>
       </div>
-      ​
+
     </div>
   )
 };

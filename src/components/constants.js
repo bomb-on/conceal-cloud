@@ -14,7 +14,7 @@ export const constants = {
   coinMarketCap: 'https://coinmarketcap.com/currencies/conceal',
   updateBlockchainHeightInterval: 30,  // seconds
   updateMarketPricesInterval: 120,  // seconds
-  maxWallets: 2,
+  maxWallets: 3,
   coinDecimals: 6,
   coinDifficultyTarget: 120,  // seconds
   defaultFee: 0.001,

@@ -447,9 +447,8 @@ const AppContextProvider = props => {
   const unlockDeposit = depositId => {
     Api.unlockDeposit(depositId)
       .then(res => {
-        if (res.result === 'success') {
-          dispatch({ type: 'UPDATE_DEPOSITS', deposits: res.message.deposits });
-        }
+        console.log(res)
+        if (res.result === 'success') getDeposits();
       })
       .catch(e => console.error(e));
   };

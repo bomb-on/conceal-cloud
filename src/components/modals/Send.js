@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { createRef, useContext, useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import QrReader from 'react-qr-reader';
@@ -9,7 +9,6 @@ import WalletDropdown from '../elements/WalletDropdown';
 import { useFormInput, useSendFormValidation, useTypeaheadInput } from '../../helpers/hooks';
 import { FormattedAmount, maskAddress } from '../../helpers/utils';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
 
 
 const SendModal = props => {
@@ -68,7 +67,9 @@ const SendModal = props => {
     wallet: selectedWallet,
   });
 
-  let addressInput = null;
+  const addressInput = createRef();
+  const resetAddressInput = () => addressInput.current.clear();
+
   const handleScan = data => {
     if (data) {
       const [prefix, ...rest] = data.split(':');
@@ -96,8 +97,6 @@ const SendModal = props => {
     console.error(err)
   };
 
-  const resetAddressInput = () => addressInput.clear();
-
   return (
     <Modal
       {...rest}
@@ -123,7 +122,7 @@ const SendModal = props => {
 
         <form
           className="send-form"
-          onSubmit={e =>
+          onSubmit={e => {
             sendTx(
               {
                 e,
@@ -138,7 +137,6 @@ const SendModal = props => {
                 id: 'sendForm',
               },
               [
-                resetAddressInput,
                 resetAddress,
                 resetPaymentID,
                 resetAmount,
@@ -147,8 +145,9 @@ const SendModal = props => {
                 resetPassword,
                 resetLabel,
               ],
-            )
-          }
+            );
+            resetAddressInput();
+          }}
         >
           <div className="form-layout form-layout-7">
 
@@ -179,7 +178,7 @@ const SendModal = props => {
               </div>
               <div className="col-7 col-sm-9">
                 <Typeahead
-                  ref={component => addressInput = component ? component.getInstance() : addressInput}
+                  ref={addressInput}
                   {...bindAddress}
                   id="address"
                   labelKey="address"
@@ -188,7 +187,7 @@ const SendModal = props => {
                   placeholder="Address"
                   emptyLabel="No records in Address Book"
                   highlightOnlyResult
-                  selectHintOnEnter
+                  inputProps={{ shouldSelectHint: (shouldSelect, e) => e.keyCode === 13 || shouldSelect }}
                   minLength={1}
                   renderMenuItemChildren={option =>
                     <>

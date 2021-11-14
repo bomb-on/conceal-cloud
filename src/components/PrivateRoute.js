@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
+import { AppContext } from './ContextProvider';
 import AuthHelper from '../helpers/AuthHelper';
+import ErrorBar from './elements/ErrorBar';
 import Header from './elements/Header';
 import NavBar from './elements/NavBar';
 import Footer from './elements/Footer';
@@ -12,6 +14,8 @@ const Auth = new AuthHelper();
 
 const PrivateRoute = props => {
   const { component: Component, ...rest } = props;
+  const { state } = useContext(AppContext);
+  const { layout } = state;
 
   return (
     <Route
@@ -22,11 +26,14 @@ const PrivateRoute = props => {
               {(props.location.pathname.startsWith('/payment/') || props.location.pathname.startsWith('/pay/'))
                 ? <Component {...props} />
                 : <>
-                    <TwoFAWarning />
-                    <Header />
-                    <NavBar />
-                    <Component {...props} />
-                    <Footer />
+                    <ErrorBar />
+                    <div style={{ paddingTop: layout.maintenance ? 46 : 0 }} >
+                      <TwoFAWarning />
+                      <Header />
+                      <NavBar />
+                      <Component {...props} />
+                      <Footer />
+                    </div>
                   </>
               }
             </>

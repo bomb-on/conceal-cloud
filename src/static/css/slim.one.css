@@ -1212,6 +1212,11 @@ hr {
   max-width: 100%;
 }
 
+.nav-item-small {
+  flex: none !important;
+  width: 50px !important;
+}
+
 .nav-item.with-sub button {
   width: 100%;
 }
@@ -1219,6 +1224,15 @@ hr {
 .nav-item.with-sub .sub-item,
 .nav-item button.nav-link {
   width: 100%;
+}
+
+.nav-item-small.with-sub .sub-item {
+  width: 150px;
+}
+
+.slim-navbar .sub-item-right {
+  right: 0;
+  left: unset !important;
 }
 
 .nav-item button.nav-link {
@@ -1649,6 +1663,20 @@ label.codeExample {
 }
 
 
+/******************** Error Bar *********************/
+
+.error-bar {
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 10px;
+  background-color: rgb(208, 8, 53);
+  color: rgb(255, 255, 255);
+  position: fixed;
+  width: 100%;
+  z-index: 9999;
+}
+
+
 /******************** 2FA Warning *********************/
 
 .twofa-warning {
@@ -1742,4 +1770,9 @@ label.codeExample {
 /******************** Deposits *********************/
 
 .current-deposit-details {
+}
+
+
+.icon-warning {
+  vertical-align: text-bottom;
 }

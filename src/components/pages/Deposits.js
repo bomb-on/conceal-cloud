@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import ReactSlider from 'react-slider';
 import { BiLockAlt, BiLockOpenAlt } from 'react-icons/bi';
+import { RiHandCoinLine } from 'react-icons/ri';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
@@ -11,11 +12,11 @@ import { FormattedAmount } from '../../helpers/utils';
 import WalletInput from '../elements/WalletInput';
 
 
-const Banking = () => {
+const Deposits = () => {
   const { actions, state } = useContext(AppContext);
   const { createDeposit, getDeposits, unlockDeposit } = actions;
   const { appSettings, deposits, layout, network, userSettings, wallets } = state;
-  const { formSubmitted, message } = layout;
+  const { formSubmitted } = layout;
   const {
     coinDecimals,
     coinDifficultyTarget,
@@ -100,9 +101,9 @@ const Banking = () => {
           <div className="slim-pageheader">
             <ol className="breadcrumb slim-breadcrumb">
               <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-              <li className="breadcrumb-item active" aria-current="page">Banking</li>
+              <li className="breadcrumb-item active" aria-current="page">Deposits</li>
             </ol>
-            <h6 className="slim-pagetitle">Banking</h6>
+            <h6 className="slim-pagetitle">Deposits</h6>
           </div>
 
           <div className="section-wrapper mg-t-20">
@@ -280,14 +281,14 @@ const Banking = () => {
                       <tbody>
                         {deposits.map(deposit => {
                           let status = 'Locked';
-                          let statusIcon = <></>
-                          if (network.blockchainHeight > deposit.unlockHeight) {
+                          let statusIcon = <BiLockAlt className="text-danger" />
+                          if (!deposit.locked) {
                             status = 'Unlocked';
-                            statusIcon = <BiLockAlt />
+                            statusIcon = <BiLockOpenAlt className="text-success" />
                           }
                           if (deposit.spendingTransactionHash) {
                             status = 'Spent';
-                            statusIcon = <BiLockOpenAlt />
+                            statusIcon = <RiHandCoinLine className="text-success" />
                           }
                           const depositAmount = deposit.amount / Math.pow(10, coinDecimals);
                           const blocksLeft = deposit.unlockHeight - network.blockchainHeight;
@@ -302,7 +303,7 @@ const Banking = () => {
                               </td>
                               <td>
                                 {
-                                  moment(deposit.timestamp)
+                                  moment()
                                     .add(blocksLeft * coinDifficultyTarget, 'seconds')
                                     .format('YYYY-MM-DD HH:mm')
                                 }
@@ -327,7 +328,7 @@ const Banking = () => {
                 {deposits && deposits.length > 0
                   ? <div className="current-deposits">
                       <ul className="list-group">
-                        {deposits.map(deposit => {
+                        {deposits.filter(i => i.spendingTransactionHash === "").map(deposit => {
                           const depositAmount = deposit.amount / Math.pow(10, coinDecimals);
 
                           let tier = 1;
@@ -341,10 +342,12 @@ const Banking = () => {
                           const depositInterestPercentage = (eir * 100).toFixed(6);
                           const totalBlocks = deposit.unlockHeight - deposit.height;
                           const blocksLeft = deposit.unlockHeight - network.blockchainHeight;
-                          const progressPercentage = Math.floor(((totalBlocks - blocksLeft) / totalBlocks) * 100);
+                          const progressPercentage = Math.floor(((totalBlocks - blocksLeft) / totalBlocks) * 100) > 100
+                            ? 100
+                            : Math.floor(((totalBlocks - blocksLeft) / totalBlocks) * 100);
                           const depositTimestamp = moment(deposit.timestamp).format('YYYY-MM-DD HH:mm UTC');
-                          const depositExpectedEnd = moment(deposit.timestamp)
-                            .add(blocksLeft * (coinDifficultyTarget + 5), 'seconds')
+                          const depositExpectedEnd = moment()
+                            .add(blocksLeft * (coinDifficultyTarget), 'seconds')
                             .format('YYYY-MM-DD HH:mm UTC');
                           return (
                             <li key={`li-${deposit.creatingTransactionHash}`} className="list-group-item">
@@ -357,13 +360,23 @@ const Banking = () => {
                                   Amount: <FormattedAmount amount={depositAmount}/>
                                 </div>
                                 <div className="text-right current-deposit-end">
-                                  Unlock height: {deposit.unlockHeight.toLocaleString()}&nbsp;
-                                  <small>({blocksLeft} blocks left)</small>
-                                  <br/>
-                                  Expected unlock time: {depositExpectedEnd}
-                                  <br/>
-                                  Interest: <FormattedAmount amount={depositInterest}/>&nbsp;
-                                  <small>({depositInterestPercentage}%)</small>
+                                  {progressPercentage === 100
+                                    ? <button
+                                        className="btn btn-outline-success"
+                                        onClick={() => unlockDeposit(deposit.depositId)}
+                                      >
+                                        WITHDRAW
+                                      </button>
+                                    : <>
+                                        Unlock height: {deposit.unlockHeight.toLocaleString()}&nbsp;
+                                        <small>({blocksLeft} blocks left)</small>
+                                        <br/>
+                                        Expected unlock time: {depositExpectedEnd}
+                                        <br/>
+                                        Interest: <FormattedAmount amount={depositInterest}/>&nbsp;
+                                        <small>({depositInterestPercentage}%)</small>
+                                      </>
+                                  }
                                 </div>
                               </div>
                               <div className="progress mg-b-10">
@@ -390,7 +403,7 @@ const Banking = () => {
             <hr />
 
             <div>
-              For more information about Conceal banking, please visit&nbsp;
+              For more information about Conceal deposits, please visit&nbsp;
               <a href="https://conceal.network/wiki/doku.php?id=banking" target="_blank" rel="noopener noreferrer">Conceal Wiki</a>.
             </div>
           </div>
@@ -401,4 +414,4 @@ const Banking = () => {
   );
 }
 
-export default Banking;
+export default Deposits;

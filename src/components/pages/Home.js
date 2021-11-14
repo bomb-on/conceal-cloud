@@ -106,7 +106,7 @@ const Home = props => {
       <header className="site-navbar py-3" role="banner" id="siteHeader">
         <div className="container-fluid">
           <div className="row align-items-center">
-            <div class="col-12 col-md-2" id="logoDiv">
+            <div className="col-12 col-md-2" id="logoDiv">
               <a href="../"></a>
             </div>
             <div className="col-12 col-md-8 d-none d-xl-block">
