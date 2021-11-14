@@ -5,6 +5,8 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
+  pull_request_target:
+    types: [ assigned, opened, synchronize, reopened, labeled ]
   create:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
@@ -97,6 +99,8 @@ jobs:
           REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
         run: CI= npm run build
       - name: Upload to S3 Bucket
+        env:
+
         run: aws s3 cp --recursive . s3://staging.conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
       - name: Invalidate Caches
         run: |
