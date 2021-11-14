@@ -71,7 +71,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id "${{ secrets.CF_DISTRIBUTION_ID }}" --paths "/*"
       - name: Prepare Release Notes
         id: release_notes
-        run: grep -ozP "(?<=#### ${GITHUB_REF##*/}\n\n)(.|\n)*?(?=\n####)" CHANGES.md | tr '\0' '\n' > release_notes.txt
+        run: grep -ozP "(?<=#### ${GITHUB_REF##*/}).*\n\n\K(.|\n)*?(?=\n####)" CHANGES.md | tr '\0' '\n' > release_notes.txt
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
