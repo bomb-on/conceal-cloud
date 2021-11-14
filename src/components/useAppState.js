@@ -17,6 +17,7 @@ const initialState = Auth => ({
     sendTxResponse: null,
     qrCodeUrl: '',
     editContactData: {},
+    maintenance: false,
   },
   user: {
     userName: '',

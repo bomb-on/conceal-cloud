@@ -13,7 +13,6 @@ const TwoFAWarning = () => {
           Your Two-Factor Authentication is not enabled. For max security, enable it in settings!
         </div>
       : <></>
-
   )
 };
 

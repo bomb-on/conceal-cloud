@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import { AppContext } from '../ContextProvider';
@@ -46,24 +47,50 @@ const Dashboard = props => {
           <div className="d-flex flex-row width-100 justify-content-between mg-b-10">
             <label className="section-title d-inline-block">Your Wallets</label>
             <div>
-              {walletsLoaded && (walletsKeys.length < appSettings.maxWallets || walletsKeys.length === 0) &&
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => {
-                    window.confirm('You are about to create a new wallet. Proceed?') &&
-                    createWallet()
-                  }}
+              {walletsLoaded &&
+                <OverlayTrigger
+                  overlay={walletsKeys.length >= appSettings.maxWallets
+                    ? <Tooltip id="button-create-wallet">
+                        Maximum number of wallets created ({appSettings.maxWallets}), please delete wallets which are not
+                        in use or create additional wallets with Conceal Desktop.
+                      </Tooltip>
+                    : <Tooltip id="button-create-wallet-hidden" hidden={true} />
+                  }
                 >
-                  CREATE NEW WALLET
-                </button>
+                  <button
+                    className={`btn btn-sm ${walletsKeys.length < appSettings.maxWallets ? 'btn-primary' : 'btn-outline-dark disabled'}`}
+                    onClick={() => {
+                      if (walletsKeys.length < appSettings.maxWallets) {
+                        window.confirm('You are about to create a new wallet. Proceed?') &&
+                        createWallet()
+                      }
+                    }}
+                  >
+                    CREATE NEW WALLET
+                  </button>
+                </OverlayTrigger>
               }
-              {walletsLoaded && (walletsKeys.length < appSettings.maxWallets + 1 || walletsKeys.length === 0) &&
-                <button
-                  className="btn btn-primary btn-sm mg-l-10"
-                  onClick={() => toggleImportWalletModalOpen(!importWalletModalOpen)}
+              {walletsLoaded &&
+                <OverlayTrigger
+                  overlay={walletsKeys.length >= appSettings.maxWallets
+                    ? <Tooltip id="button-import-wallet">
+                      Maximum number of wallets imported ({appSettings.maxWallets + 1}), please delete wallets which are
+                      not in use or create/import additional wallets with Conceal Desktop.
+                    </Tooltip>
+                    : <Tooltip id="button-import-wallet-hidden" hidden={true} />
+                  }
                 >
-                  IMPORT WALLET
-                </button>
+                  <button
+                    className={`btn btn-sm mg-l-10 ${walletsKeys.length < appSettings.maxWallets + 1 ? 'btn-primary' : 'btn-outline-dark disabled'}`}
+                    onClick={() => {
+                      if (walletsKeys.length < appSettings.maxWallets + 1) {
+                        toggleImportWalletModalOpen(!importWalletModalOpen);
+                      }
+                    }}
+                  >
+                    IMPORT WALLET
+                  </button>
+                </OverlayTrigger>
               }
             </div>
           </div>

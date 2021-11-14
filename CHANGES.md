@@ -1,3 +1,17 @@
+#### 1.4.2
+
+**Features**
+
+ - Increased maximum amount of created wallets to 3 and imported wallets to 4
+ - Renamed Banking to Deposits
+ - Added maintenance notification bar
+ - Updated all dependencies to the latest versions
+
+**Bug Fixes**
+
+ - Fixed errors in case wallet gets corrupted
+ - Fixed an issue with `<div>` IDs in Messages
+
 #### 1.4.1 (2020-10-01)
 
 **Bug Fixes**
