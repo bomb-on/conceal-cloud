@@ -5,6 +5,8 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
+  pull_request_target:
+    types: [ labeled ]
   create:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
@@ -16,6 +18,7 @@ env:
 
 jobs:
   prepare:
+    if: github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'PR approved')
     name: Prepare Deployment
     runs-on: ubuntu-latest
     outputs:
@@ -58,11 +61,11 @@ jobs:
         with:
           node-version: ${{ needs.prepare.outputs.nodejs_version }}
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps --only=production
+        run: npm ci
       - name: Build Version
         env:
           REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
-        run: npm run build
+        run: CI= npm run build
       - name: Upload to S3 Bucket
         run: aws s3 cp --recursive . s3://conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
       - name: Invalidate Caches
@@ -95,7 +98,7 @@ jobs:
       - name: Build Version
         env:
           REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
-        run: npm run build
+        run: CI= npm run build
       - name: Upload to S3 Bucket
         run: aws s3 cp --recursive . s3://staging.conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
       - name: Invalidate Caches
