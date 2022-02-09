@@ -65,6 +65,7 @@ jobs:
       - name: Build Version
         env:
           REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+          REACT_APP_HCAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_HCAPTCHA_SITE_KEY }}
         run: CI= npm run build
       - name: Upload to S3 Bucket
         run: aws s3 cp --recursive ./build/ s3://conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE
@@ -98,6 +99,7 @@ jobs:
       - name: Build Version
         env:
           REACT_APP_VERSION_SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+          REACT_APP_HCAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_HCAPTCHA_SITE_KEY }}
         run: CI= npm run build
       - name: Upload to S3 Bucket
         run: aws s3 cp --recursive ./build/ s3://staging.conceal.cloud/ --cache-control max-age=30 --metadata-directive REPLACE

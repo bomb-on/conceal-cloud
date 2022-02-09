@@ -4,18 +4,20 @@ export default class ApiHelper {
     this.auth = options.Auth;
   }
 
-  signUpUser = (userName, email, password) => {
+  signUpUser = (userName, email, password, captchaToken) => {
     const body = {
       email,
       name: userName,
       password,
     };
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
     return this.fetch(`${this.apiURL}/user`, { method: 'POST', body: JSON.stringify(body) })
       .then(res => Promise.resolve(res));
   };
 
-  resetPassword = email => {
+  resetPassword = (email, captchaToken) => {
     const body = JSON.stringify({ email });
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
     return this.fetch(`${this.apiURL}/auth/`, { method: 'PUT', body })
       .then(res => Promise.resolve(res));
   };

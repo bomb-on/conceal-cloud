@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
@@ -8,13 +9,14 @@ import { useFormInput, useFormValidation } from '../../helpers/hooks';
 const SignUp = () => {
   const { actions, state } = useContext(AppContext);
   const { signUpUser } = actions;
-  const { layout, user, userSettings } = state;
+  const { appSettings, layout, user, userSettings } = state;
   const { formSubmitted, message } = layout;
-
+  const captchaRef = useRef(null);
 
   const { value: userName, bind: bindUserName } = useFormInput('');
   const { value: email, bind: bindEmail } = useFormInput('');
   const { value: password, bind: bindPassword } = useFormInput('');
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const formValidation = (
     userName !== '' && userName.length >= 3 &&
@@ -36,7 +38,14 @@ const SignUp = () => {
           <div className="alert alert-outline alert-danger text-center">{message.signUpForm}</div>
         }
 
-        <form onSubmit={e => signUpUser({ e, userName, email, password, id: 'signUpForm' })}>
+        <form onSubmit={e => {
+          if (!captchaToken) {
+            e.preventDefault();
+            captchaRef.current.execute();
+          } else {
+            signUpUser({ captchaToken, e, userName, email, password, id: 'signUpForm' });
+          }
+        }}>
           <div className="form-group">
             <input
               {...bindUserName}
@@ -57,7 +66,7 @@ const SignUp = () => {
               minLength={3}
             />
           </div>
-          <div className="form-group mg-b-50">
+          <div className="form-group">
             <input
               {...bindPassword}
               placeholder="Password"
@@ -67,10 +76,17 @@ const SignUp = () => {
               minLength={8}
             />
           </div>
+          <div className="text-center mg-b-50">
+            <HCaptcha
+              sitekey={appSettings.hCaptchaSiteKey}
+              onVerify={setCaptchaToken}
+              ref={captchaRef}
+            />
+          </div>
 
           <button
             type="submit"
-            disabled={formSubmitted || !formValid}
+            disabled={formSubmitted || !formValid || !captchaToken}
             className="btn btn-primary btn-block btn-signin"
           >
             {formSubmitted ? 'Signing Up...' : 'Sign Up'}
@@ -84,7 +100,6 @@ const SignUp = () => {
           Copyright 2019 &copy; All Rights Reserved. Conceal Network<br /><Link to="/terms">Terms &amp; Conditions</Link>
         </p>
       </div>
-      ​
     </div>
   )
 };

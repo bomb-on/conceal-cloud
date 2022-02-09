@@ -20,10 +20,10 @@ const AppContextProvider = props => {
   const Api = new ApiHelper({ Auth, state });
 
   const loginUser = options => {
-    const { e, email, password, twoFACode, id } = options;
+    const { captchaToken, e, email, password, token, twoFACode, id } = options;
     e.preventDefault();
     dispatch({ type: 'FORM_SUBMITTED', value: true });
-    Auth.login(email, password, twoFACode)
+    Auth.login(email, password, captchaToken, twoFACode)
       .then(res => {
         if (res.result === 'success') {
           dispatch({ type: 'REDIRECT_TO_REFERRER', value: true });
@@ -37,11 +37,11 @@ const AppContextProvider = props => {
   };
 
   const signUpUser = options => {
-    const { e, userName, email, password, id } = options;
+    const { captchaToken, e, userName, email, password, id } = options;
     e.preventDefault();
     let message;
     dispatch({ type: 'FORM_SUBMITTED', value: true });
-    Api.signUpUser(userName, email, password)
+    Api.signUpUser(userName, email, password, captchaToken)
       .then(res => {
         message = res.message;
         if (res.result === 'success') {
@@ -57,11 +57,11 @@ const AppContextProvider = props => {
   };
 
   const resetPassword = options => {
-    const { e, email, id } = options;
+    const { captchaToken, e, email, id } = options;
     e.preventDefault();
     dispatch({ type: 'FORM_SUBMITTED', value: true });
     let message;
-    Api.resetPassword(email)
+    Api.resetPassword(email, captchaToken)
       .then(res => {
         message = res.message;
         if (res.result === 'success') {

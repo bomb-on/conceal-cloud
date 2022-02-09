@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
@@ -9,12 +10,14 @@ const Login = () => {
   const location = useLocation();
   const { actions, state } = useContext(AppContext);
   const { loginUser } = actions;
-  const { layout, user, userSettings } = state;
+  const { appSettings, layout, user, userSettings } = state;
   const { redirectToReferrer, formSubmitted, message } = layout;
+  const captchaRef = useRef(null);
 
   const { value: email, bind: bindEmail } = useFormInput('');
   const { value: password, bind: bindPassword } = useFormInput('');
   const { value: twoFACode, bind: bindTwoFACode } = useFormInput('');
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const formValidation = (
     email !== '' && email.length >= 3 &&
@@ -44,7 +47,14 @@ const Login = () => {
           </div>
         }
 
-        <form onSubmit={e => loginUser({ e, email, password, twoFACode, id: 'loginForm' })}>
+        <form onSubmit={e => {
+          if (!captchaToken) {
+            e.preventDefault();
+            captchaRef.current.execute();
+          } else {
+            loginUser({ captchaToken, e, email, password, twoFACode, id: 'loginForm' });
+          }
+        }}>
           <div className="form-group">
             <input
               {...bindEmail}
@@ -67,7 +77,7 @@ const Login = () => {
             />
           </div>
 
-          <div className="form-group mg-b-50">
+          <div className="form-group">
             <input
               {...bindTwoFACode}
               placeholder="2-Factor Authentication (if enabled)"
@@ -78,9 +88,17 @@ const Login = () => {
             />
           </div>
 
+          <div className="text-center mg-b-50">
+            <HCaptcha
+              sitekey={appSettings.hCaptchaSiteKey}
+              onVerify={setCaptchaToken}
+              ref={captchaRef}
+            />
+          </div>
+
           <button
             type="submit"
-            disabled={formSubmitted || !formValid}
+            disabled={formSubmitted || !formValid || !captchaToken}
             className="btn btn-primary btn-block btn-signin"
           >
             {formSubmitted ? 'Signing In...' : 'Sign In'}

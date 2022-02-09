@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://conceal.cloud",
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.1.0",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",

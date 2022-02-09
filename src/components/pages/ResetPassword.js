@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { AppContext } from '../ContextProvider';
 import { useFormInput, useFormValidation } from '../../helpers/hooks';
@@ -9,12 +10,14 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const { actions, state } = useContext(AppContext);
   const { resetPassword, resetPasswordConfirm } = actions;
-  const { layout, user, userSettings } = state;
+  const { appSettings, layout, user, userSettings } = state;
   const { formSubmitted, message } = layout;
+  const captchaRef = useRef(null);
 
   const { value: email, bind: bindEmail } = useFormInput('');
   const { value: password, bind: bindPassword } = useFormInput('');
   const { value: passwordConfirm, bind: bindPasswordConfirm } = useFormInput('');
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const formValidation = (
     searchParams.token
@@ -83,11 +86,16 @@ const ResetPassword = () => {
               </button>
             </form>
           : <form
-              onSubmit={e =>
-                resetPassword({ e, email, id: 'resetPasswordForm' })
-              }
+              onSubmit={e => {
+                if (!captchaToken) {
+                  e.preventDefault();
+                  captchaRef.current.execute();
+                } else {
+                  resetPassword({ captchaToken, e, email, id: 'resetPasswordForm' })
+                }
+              }}
             >
-              <div className="form-group mg-b-50">
+              <div className="form-group">
                 <input
                   {...bindEmail}
                   placeholder="Enter your email"
@@ -97,6 +105,13 @@ const ResetPassword = () => {
                   minLength={3}
                 />
               </div>
+            <div className="text-center mg-b-50">
+              <HCaptcha
+                sitekey={appSettings.hCaptchaSiteKey}
+                onVerify={setCaptchaToken}
+                ref={captchaRef}
+              />
+            </div>
 
               <button
                 type="submit"
