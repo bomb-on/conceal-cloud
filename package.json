@@ -35,7 +35,12 @@
     "start": "HTTPS=true react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "aws:dev": "npm run build:clean && aws s3 cp --recursive ./build/ s3://staging.conceal.cloud/ --profile=conceal --cache-control max-age=30 --metadata-directive REPLACE && npm run aws:dev:invalidate",
+    "aws:dev:invalidate": "aws configure set preview.cloudfront true --profile=conceal && aws cloudfront create-invalidation --profile=conceal --distribution-id E169UVS7EN89FY --paths \"/*\"",
+    "aws:prod": "npm run build:clean && aws s3 cp --recursive ./build/ s3://conceal.cloud/ --profile=conceal --cache-control max-age=30 --metadata-directive REPLACE && npm run aws:invalidate",
+    "aws:invalidate": "aws configure set preview.cloudfront true --profile=conceal && aws cloudfront create-invalidation --profile=conceal --distribution-id E1GRNOKTY1DVG --paths \"/*\"",
+    "build:clean": "rm -rf ./build && react-scripts build"
   },
   "eslintConfig": {
     "extends": [

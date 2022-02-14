@@ -58,7 +58,7 @@ const Login = () => {
           <div className="form-group">
             <input
               {...bindEmail}
-              placeholder="Enter your email"
+              placeholder="Enter your user name or email"
               type="email"
               name="email"
               className="form-control"

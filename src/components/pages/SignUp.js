@@ -59,12 +59,15 @@ const SignUp = () => {
           <div className="form-group">
             <input
               {...bindEmail}
-              placeholder="E-mail"
+              placeholder="E-mail (optional)"
               type="email"
               name="email"
               className="form-control"
               minLength={3}
             />
+            <small className="text-danger">
+              Note: while not providing e-mail provides greater privacy, you <strong>will not be able</strong> to recover your password.
+            </small>
           </div>
           <div className="form-group">
             <input
