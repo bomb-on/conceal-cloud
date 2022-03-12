@@ -52,7 +52,11 @@ const SendModal = props => {
 
   useEffect(() => {
     setPaymentIDValue(paymentIDValue);
-  }, [paymentIDValue, setPaymentIDValue]);
+  }, [paymentIDValue]);
+
+  useEffect(() => {
+    props.contact && props.contact.paymentID && setPaymentIDValue(props.contact.paymentID);
+  }, [props.contact]);
 
   const formValid = useSendFormValidation({
     amount,

@@ -1,18 +1,23 @@
 import React, { useContext, useRef, useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { AppContext } from '../ContextProvider';
-import { useFormInput, useFormValidation } from '../../helpers/hooks';
+import { useFormInput, useFormValidation, useMountEffect } from '../../helpers/hooks';
 
 
 const Login = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { actions, state } = useContext(AppContext);
   const { loginUser } = actions;
   const { appSettings, layout, user, userSettings } = state;
   const { redirectToReferrer, formSubmitted, message } = layout;
   const captchaRef = useRef(null);
+
+  useMountEffect(() => {
+    if (user.loggedIn()) navigate('/dashboard');
+  });
 
   const { value: email, bind: bindEmail } = useFormInput('');
   const { value: password, bind: bindPassword } = useFormInput('');
@@ -28,10 +33,8 @@ const Login = () => {
 
   if (redirectToReferrer && location.state && user.loggedIn()) {
     const { from } = location.state;
-    return <Navigate to={from} />;
+    navigate(from);
   }
-
-  if (user.loggedIn()) return <Navigate to="/dashboard" />;
 
   return (
     <div className="signin-wrapper">
@@ -59,7 +62,7 @@ const Login = () => {
             <input
               {...bindEmail}
               placeholder="Enter your user name or email"
-              type="email"
+              type="text"
               name="email"
               className="form-control"
               minLength={3}

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   FaBars,
   FaCloudDownloadAlt,
@@ -14,6 +14,7 @@ import {
   FaUserPlus,
 } from 'react-icons/fa';
 import AOS from 'aos';
+import { useMountEffect } from '../../helpers/hooks';
 
 import { AppContext } from '../ContextProvider';
 import { useAddToHomescreenPrompt } from '../../helpers/HomeScreen';
@@ -28,10 +29,15 @@ import landingImg6 from '../../static/img/landing_img6.jpg';
 
 const Home = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [getIsVisible, promptToInstall] = useAddToHomescreenPrompt();
   const { state } = useContext(AppContext);
   const { layout, user } = state;
   const { redirectToReferrer } = layout;
+
+  useMountEffect(() => {
+    if (user.loggedIn()) navigate('/dashboard');
+  });
 
   useEffect(() => {
     AOS.init({
@@ -88,10 +94,8 @@ const Home = () => {
 
   if (redirectToReferrer && location.state && user.loggedIn()) {
     const { from } = location.state;
-    return <Navigate to={from} />;
+    return navigate(from);
   }
-
-  if (user.loggedIn()) return <Navigate to="/dashboard" />;
 
   return (
     <div className="landing-site-wrap">

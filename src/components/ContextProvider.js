@@ -20,7 +20,7 @@ const AppContextProvider = props => {
   const Api = new ApiHelper({ Auth, state });
 
   const loginUser = options => {
-    const { captchaToken, e, email, password, token, twoFACode, id } = options;
+    const { captchaToken, e, email, password, twoFACode, id } = options;
     e.preventDefault();
     dispatch({ type: 'FORM_SUBMITTED', value: true });
     Auth.login(email, password, captchaToken, twoFACode)
@@ -28,6 +28,7 @@ const AppContextProvider = props => {
         if (res.result === 'success') {
           dispatch({ type: 'REDIRECT_TO_REFERRER', value: true });
           initApp();
+          return navigate('/');
         } else {
           dispatch({ type: 'DISPLAY_MESSAGE', message: res.message, id });
         }
@@ -45,7 +46,9 @@ const AppContextProvider = props => {
       .then(res => {
         message = res.message;
         if (res.result === 'success') {
-          message = 'Please check your email and follow the instructions to activate your account.';
+          message = email !== ""
+            ? 'Please check your email and follow the instructions to activate your account.'
+            : 'Registration successful.';
           return navigate('/login');
         }
       })
@@ -57,6 +60,7 @@ const AppContextProvider = props => {
   };
 
   const resetPassword = options => {
+    console.log(options)
     const { captchaToken, e, email, id } = options;
     e.preventDefault();
     dispatch({ type: 'FORM_SUBMITTED', value: true });
@@ -68,7 +72,7 @@ const AppContextProvider = props => {
           message = 'Please check your email and follow instructions to reset password.';
           Auth.logout();
           clearApp();
-          navigate('/login');
+          return navigate('/login');
         }
       })
       .catch(err => { message = `ERROR ${err}` })
@@ -79,15 +83,15 @@ const AppContextProvider = props => {
   };
 
   const resetPasswordConfirm = options => {
-    const { e, password, token, id } = options;
+    const { captchaToken, e, password, token, id } = options;
     e.preventDefault();
     let message;
     dispatch({ type: 'FORM_SUBMITTED', value: true });
-    Api.resetPasswordConfirm(password, token)
+    Api.resetPasswordConfirm(password, token, captchaToken)
       .then(res => {
         message = res.message;
         if (res.result === 'success') {
-          message = (<>Password successfully changed.<br />Please log in.</>);
+          message = 'Password successfully changed. Please log in.'
           return navigate('/login');
         }
       })
