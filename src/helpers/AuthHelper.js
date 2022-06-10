@@ -6,12 +6,13 @@ export default class AuthHelper {
     this.domain = process.env.REACT_APP_API_ENDPOINT;
   }
 
-  login = (email, password, twoFACode) => {
+  login = (email, password, captchaToken, twoFACode) => {
     const body = {
       email,
       password,
       rememberme: false,
     };
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
     if (twoFACode && twoFACode !== '') body.code = twoFACode;
     return this.fetch(`${this.domain}/auth`, { method: 'POST', body: JSON.stringify(body) })
       .then(res => {

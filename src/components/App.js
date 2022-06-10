@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ReactNotification from 'react-notifications-component'
+import { ReactNotifications } from 'react-notifications-component';
 
 import AppContextProvider from './ContextProvider';
 import Home from './pages/Home';
@@ -30,12 +30,15 @@ import '../static/css/font-awesome-animation.min.css';
 const App = () => (
   <Router>
     <AppContextProvider>
-      <ReactNotification />
+      <ReactNotifications />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset_password" element={<ResetPassword />} />
+        <Route path="/reset_password">
+          <Route path=":token" element={<ResetPassword />} />
+          <Route path="" element={<ResetPassword />} />
+        </Route>
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy_policy" element={<Policy />} />
 

@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://conceal.cloud",
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.1.0",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
@@ -12,8 +13,8 @@
     "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
     "jwt-decode": "^3.1.2",
-    "moment": "^2.29.1",
-    "multicoin-address-validator": "git+https://github.com/bomb-on/multicoin-address-validator.git",
+    "moment": "^2.29.2",
+    "multicoin-address-validator": "github:bomb-on/multicoin-address-validator",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
@@ -23,10 +24,10 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-moment": "^1.1.1",
-    "react-notifications-component": "^3.1.0",
+    "react-notifications-component": "^3.4.0",
     "react-qr-reader": "^2.2.1",
-    "react-router-dom": "^6.0.1",
-    "react-scripts": "4.0.3",
+    "react-router-dom": "^6.2.1",
+    "react-scripts": "^5.0.1",
     "react-slider": "^1.3.1",
     "web-vitals": "^2.1.2"
   },
@@ -34,7 +35,12 @@
     "start": "HTTPS=true react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "aws:dev": "npm run build:clean && aws s3 cp --recursive ./build/ s3://staging.conceal.cloud/ --profile=conceal --cache-control max-age=30 --metadata-directive REPLACE && npm run aws:dev:invalidate",
+    "aws:dev:invalidate": "aws configure set preview.cloudfront true --profile=conceal && aws cloudfront create-invalidation --profile=conceal --distribution-id E169UVS7EN89FY --paths \"/*\"",
+    "aws:prod": "npm run build:clean && aws s3 cp --recursive ./build/ s3://conceal.cloud/ --profile=conceal --cache-control max-age=30 --metadata-directive REPLACE && npm run aws:invalidate",
+    "aws:invalidate": "aws configure set preview.cloudfront true --profile=conceal && aws cloudfront create-invalidation --profile=conceal --distribution-id E1GRNOKTY1DVG --paths \"/*\"",
+    "build:clean": "rm -rf ./build && react-scripts build"
   },
   "eslintConfig": {
     "extends": [

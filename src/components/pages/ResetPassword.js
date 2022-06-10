@@ -1,31 +1,38 @@
-import React, { useContext } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import React, { useContext, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { AppContext } from '../ContextProvider';
-import { useFormInput, useFormValidation } from '../../helpers/hooks';
+import { useFormInput, useFormValidation, useMountEffect } from '../../helpers/hooks';
 
 
 const ResetPassword = () => {
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const params = useParams();
+  const token = params.token?.match(/^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$/) ? params.token : null;
   const { actions, state } = useContext(AppContext);
   const { resetPassword, resetPasswordConfirm } = actions;
-  const { layout, user, userSettings } = state;
+  const { appSettings, layout, user, userSettings } = state;
   const { formSubmitted, message } = layout;
+  const captchaRef = useRef(null);
+
+  useMountEffect(() => {
+    if (user.loggedIn()) navigate('/dashboard');
+  });
 
   const { value: email, bind: bindEmail } = useFormInput('');
   const { value: password, bind: bindPassword } = useFormInput('');
   const { value: passwordConfirm, bind: bindPasswordConfirm } = useFormInput('');
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const formValidation = (
-    searchParams.token
+    token
       ? password !== '' && password.length >= userSettings.minimumPasswordLength &&
         passwordConfirm !== '' && passwordConfirm.length >= userSettings.minimumPasswordLength &&
         password === passwordConfirm
-      : email !== '' && email.length >= 3
+      : email !== '' && email.length >= 3 && email.includes('@')
   );
   const formValid = useFormValidation(formValidation);
-
-  if (user.loggedIn()) return <Navigate to="/" />;
 
   return (
     <div className="signin-wrapper">
@@ -38,16 +45,22 @@ const ResetPassword = () => {
           <div className="alert alert-outline alert-danger text-center">{message.resetPasswordForm}</div>
         }
 
-        {searchParams.token
+        {token
           ? <form
-              onSubmit={e =>
-                resetPasswordConfirm({
-                  e,
-                  password,
-                  token: searchParams.token,
-                  id: 'resetPasswordConfirmForm',
-                })
-              }
+              onSubmit={e => {
+                if (!captchaToken) {
+                  e.preventDefault();
+                  captchaRef.current.execute();
+                } else {
+                  resetPasswordConfirm({
+                    e,
+                    captchaToken,
+                    password,
+                    token: token,
+                    id: 'resetPasswordConfirmForm',
+                  })
+                }
+              }}
             >
               <div className="form-group">
                 <input
@@ -69,6 +82,13 @@ const ResetPassword = () => {
                   minLength={8}
                 />
               </div>
+              <div className="text-center mg-b-50">
+                <HCaptcha
+                  sitekey={appSettings.hCaptchaSiteKey}
+                  onVerify={setCaptchaToken}
+                  ref={captchaRef}
+                />
+              </div>
 
               {message.resetPasswordConfirmForm &&
                 <div className="text-danger text-center">{message.resetPasswordConfirmForm}</div>
@@ -83,11 +103,16 @@ const ResetPassword = () => {
               </button>
             </form>
           : <form
-              onSubmit={e =>
-                resetPassword({ e, email, id: 'resetPasswordForm' })
-              }
+              onSubmit={e => {
+                if (!captchaToken) {
+                  e.preventDefault();
+                  captchaRef.current.execute();
+                } else {
+                  resetPassword({ captchaToken, e, email, id: 'resetPasswordForm' })
+                }
+              }}
             >
-              <div className="form-group mg-b-50">
+              <div className="form-group">
                 <input
                   {...bindEmail}
                   placeholder="Enter your email"
@@ -95,6 +120,13 @@ const ResetPassword = () => {
                   name="email"
                   className="form-control"
                   minLength={3}
+                />
+              </div>
+              <div className="text-center mg-b-50">
+                <HCaptcha
+                  sitekey={appSettings.hCaptchaSiteKey}
+                  onVerify={setCaptchaToken}
+                  ref={captchaRef}
                 />
               </div>
 

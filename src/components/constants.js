@@ -34,4 +34,5 @@ export const constants = {
   qrCodePrefix: 'conceal',
   donationURL: 'https://conceal.cloud/payment',
   IPNURL: 'https://conceal.cloud/pay',
+  hCaptchaSiteKey: process.env.REACT_APP_HCAPTCHA_SITE_KEY,
 };

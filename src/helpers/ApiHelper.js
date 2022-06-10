@@ -4,26 +4,29 @@ export default class ApiHelper {
     this.auth = options.Auth;
   }
 
-  signUpUser = (userName, email, password) => {
+  signUpUser = (userName, email, password, captchaToken) => {
     const body = {
-      email,
+      email: email === "" ? userName : email,
       name: userName,
       password,
     };
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
     return this.fetch(`${this.apiURL}/user`, { method: 'POST', body: JSON.stringify(body) })
       .then(res => Promise.resolve(res));
   };
 
-  resetPassword = email => {
-    const body = JSON.stringify({ email });
-    return this.fetch(`${this.apiURL}/auth/`, { method: 'PUT', body })
+  resetPassword = (email, captchaToken) => {
+    const body = { email };
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
+    return this.fetch(`${this.apiURL}/auth/`, { method: 'PUT', body: JSON.stringify(body) })
       .then(res => Promise.resolve(res));
   };
 
-  resetPasswordConfirm = (password, Token) => {
+  resetPasswordConfirm = (password, Token, captchaToken) => {
     const headers = { Token };
-    const body = JSON.stringify({ password });
-    return this.fetch(`${this.apiURL}/auth/`, { method: 'PATCH', headers, body })
+    const body = { password };
+    if (captchaToken && captchaToken !== '') body['h-captcha-response'] = captchaToken;
+    return this.fetch(`${this.apiURL}/auth/`, { method: 'PATCH', headers, body: JSON.stringify(body) })
       .then(res => Promise.resolve(res));
   };
 
