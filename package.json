@@ -12,7 +12,7 @@
     "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
     "jwt-decode": "^3.1.2",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "multicoin-address-validator": "git+https://github.com/bomb-on/multicoin-address-validator.git",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.2",
